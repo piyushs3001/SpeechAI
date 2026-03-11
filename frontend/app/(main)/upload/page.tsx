@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import { useAppStore } from "@/lib/store";
 import { UploadDropzone } from "@/components/upload-dropzone";
 import { UploadProgress } from "@/components/upload-progress";
+import { useToast } from "@/components/toast";
 
 export default function UploadPage() {
   const fetchFolders = useAppStore((s) => s.fetchFolders);
+  const { error: toastError } = useToast();
   const [state, setState] = useState<"selecting" | "uploading">("selecting");
   const [jobId, setJobId] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -32,7 +34,9 @@ export default function UploadPage() {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({ detail: "Upload failed" }));
-        setUploadError(err.detail || "Upload failed");
+        const msg = err.detail || "Upload failed";
+        setUploadError(msg);
+        toastError(msg);
         return;
       }
 
@@ -40,7 +44,9 @@ export default function UploadPage() {
       setJobId(data.job_id);
       setState("uploading");
     } catch {
-      setUploadError("Network error. Please try again.");
+      const msg = "Network error. Please try again.";
+      setUploadError(msg);
+      toastError(msg);
     }
   }
 

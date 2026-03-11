@@ -3,9 +3,11 @@
 import { useEffect, useMemo } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Mic } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { MeetingCard } from "@/components/meeting-card";
+import { LoadingSpinner } from "@/components/loading-spinner";
+import { EmptyState } from "@/components/empty-state";
 
 export default function FolderViewPage() {
   const params = useParams<{ id: string }>();
@@ -55,18 +57,13 @@ export default function FolderViewPage() {
 
       {/* Content */}
       {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <div className="text-center">
-            <div className="mb-3 h-8 w-8 mx-auto animate-spin rounded-full border-2 border-gray-600 border-t-[#64b5f6]" />
-            <p className="text-sm text-gray-400">Loading meetings...</p>
-          </div>
-        </div>
+        <LoadingSpinner message="Loading meetings..." />
       ) : filteredMeetings.length === 0 ? (
-        <div className="flex items-center justify-center py-20">
-          <p className="text-sm text-gray-500">
-            No meetings in this folder yet.
-          </p>
-        </div>
+        <EmptyState
+          icon={<Mic size={40} className="text-gray-600" />}
+          message="No meetings in this folder yet"
+          description="Upload a recording or move an existing meeting here."
+        />
       ) : (
         <div className="flex flex-col gap-3">
           {filteredMeetings.map((meeting) => (

@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Users } from "lucide-react";
+import { LoadingSpinner } from "@/components/loading-spinner";
+import { ErrorState } from "@/components/error-state";
+import { EmptyState } from "@/components/empty-state";
 
 interface TeamMember {
   email: string;
@@ -12,31 +15,37 @@ interface TeamMember {
 export default function TeamPage() {
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  useEffect(() => {
+  function loadTeam() {
+    setLoading(true);
+    setLoadError(null);
     fetch("/api/team")
       .then((res) => {
-        if (!res.ok) throw new Error("Failed");
+        if (!res.ok) throw new Error("Failed to load team");
         return res.json();
       })
       .then((data) => {
         setMembers(data.members || []);
       })
-      .catch(() => {
-        // silently fail
+      .catch((err) => {
+        setLoadError(
+          err instanceof Error ? err.message : "Failed to load team"
+        );
       })
       .finally(() => setLoading(false));
+  }
+
+  useEffect(() => {
+    loadTeam();
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-center">
-          <div className="mb-3 h-8 w-8 mx-auto animate-spin rounded-full border-2 border-gray-600 border-t-[#64b5f6]" />
-          <p className="text-sm text-gray-400">Loading team...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner message="Loading team..." />;
+  }
+
+  if (loadError) {
+    return <ErrorState message={loadError} onRetry={loadTeam} />;
   }
 
   return (
@@ -63,9 +72,11 @@ export default function TeamPage() {
 
       {/* Members list */}
       {members.length === 0 ? (
-        <div className="flex items-center justify-center py-20">
-          <p className="text-sm text-gray-500">No team members found.</p>
-        </div>
+        <EmptyState
+          icon={<Users size={40} className="text-gray-600" />}
+          message="No team members found"
+          description="Share your Google Drive folder with others to grant access."
+        />
       ) : (
         <div className="flex flex-col gap-2">
           {members.map((member) => (

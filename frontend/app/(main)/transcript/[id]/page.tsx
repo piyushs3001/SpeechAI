@@ -12,6 +12,9 @@ import {
   exportPDF,
   downloadFile,
 } from "@/lib/export";
+import { LoadingSpinner } from "@/components/loading-spinner";
+import { ErrorState } from "@/components/error-state";
+import { EmptyState } from "@/components/empty-state";
 
 const SPEAKER_COLORS = [
   "#4CAF50",
@@ -73,6 +76,7 @@ export default function TranscriptViewerPage() {
 
   const [meeting, setMeeting] = useState<MeetingDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [exportOpen, setExportOpen] = useState(false);
   const [summaryData, setSummaryData] = useState<{
@@ -86,17 +90,21 @@ export default function TranscriptViewerPage() {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setFetchError(null);
 
     fetch(`/api/meetings/${id}`)
       .then((res) => {
-        if (!res.ok) throw new Error("Failed");
+        if (!res.ok) throw new Error("Failed to load transcript");
         return res.json();
       })
       .then((data) => {
         if (!cancelled) setMeeting(data);
       })
-      .catch(() => {
-        // error state handled by meeting being null
+      .catch((err) => {
+        if (!cancelled)
+          setFetchError(
+            err instanceof Error ? err.message : "Failed to load transcript"
+          );
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -133,29 +141,46 @@ export default function TranscriptViewerPage() {
   }, []);
 
   if (loading) {
+    return <LoadingSpinner message="Loading transcript..." />;
+  }
+
+  if (fetchError) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-center">
-          <div className="mb-3 h-8 w-8 mx-auto animate-spin rounded-full border-2 border-gray-600 border-t-[#64b5f6]" />
-          <p className="text-sm text-gray-400">Loading transcript...</p>
-        </div>
-      </div>
+      <ErrorState
+        message={fetchError}
+        onRetry={() => {
+          setFetchError(null);
+          setLoading(true);
+          fetch(`/api/meetings/${id}`)
+            .then((res) => {
+              if (!res.ok) throw new Error("Failed to load transcript");
+              return res.json();
+            })
+            .then((data) => setMeeting(data))
+            .catch((err) =>
+              setFetchError(
+                err instanceof Error ? err.message : "Failed to load transcript"
+              )
+            )
+            .finally(() => setLoading(false));
+        }}
+      />
     );
   }
 
   if (!meeting) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-center">
-          <p className="text-sm text-gray-400">Transcript not found.</p>
+      <EmptyState
+        message="Transcript not found."
+        action={
           <Link
             href="/dashboard"
-            className="mt-3 inline-block text-sm text-[#64b5f6] hover:underline"
+            className="inline-block text-sm text-[#64b5f6] hover:underline"
           >
             Back to Dashboard
           </Link>
-        </div>
-      </div>
+        }
+      />
     );
   }
 
@@ -304,9 +329,10 @@ export default function TranscriptViewerPage() {
         {/* Transcript segments */}
         <div className="flex-1 overflow-y-auto -mr-2 pr-2">
           {segments.length === 0 ? (
-            <div className="flex items-center justify-center py-10">
-              <p className="text-sm text-gray-500">No transcript segments available.</p>
-            </div>
+            <EmptyState
+              message="No transcript segments available."
+              className="py-10"
+            />
           ) : (
             <div className="flex flex-col gap-1">
               {segments.map((seg, i) => (

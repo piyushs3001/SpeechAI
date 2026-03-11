@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Search as SearchIcon } from "lucide-react";
 import { useSearch, SearchResult } from "@/hooks/use-search";
 import { useAppStore } from "@/lib/store";
+import { LoadingSpinner } from "@/components/loading-spinner";
+import { EmptyState } from "@/components/empty-state";
 
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
@@ -153,27 +155,16 @@ export default function SearchPage() {
 
       {/* Results */}
       {loading && !initialized ? (
-        <div className="flex items-center justify-center py-20">
-          <div className="text-center">
-            <div className="mb-3 h-8 w-8 mx-auto animate-spin rounded-full border-2 border-gray-600 border-t-[#64b5f6]" />
-            <p className="text-sm text-gray-400">Building search index...</p>
-          </div>
-        </div>
+        <LoadingSpinner message="Building search index..." />
       ) : !query.trim() ? (
-        <div className="flex items-center justify-center py-20">
-          <div className="text-center">
-            <SearchIcon size={40} className="mx-auto mb-3 text-gray-600" />
-            <p className="text-sm text-gray-500">
-              Search across all your meeting transcripts
-            </p>
-          </div>
-        </div>
+        <EmptyState
+          icon={<SearchIcon size={40} className="text-gray-600" />}
+          message="Search across all your meeting transcripts"
+        />
       ) : results.length === 0 ? (
-        <div className="flex items-center justify-center py-20">
-          <p className="text-sm text-gray-500">
-            No results found for &ldquo;{query}&rdquo;
-          </p>
-        </div>
+        <EmptyState
+          message={`No results found for "${query}"`}
+        />
       ) : (
         <div className="flex flex-col gap-2">
           <p className="mb-2 text-xs text-gray-500">

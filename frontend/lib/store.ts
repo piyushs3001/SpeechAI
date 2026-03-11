@@ -22,6 +22,7 @@ interface AppState {
   meetings: Meeting[];
   folders: Folder[];
   loading: boolean;
+  error: string | null;
   fetchMeetings: () => Promise<void>;
   fetchFolders: () => Promise<void>;
   addFolder: (name: string, color: string) => Promise<void>;
@@ -32,25 +33,31 @@ export const useAppStore = create<AppState>((set) => ({
   meetings: [],
   folders: [],
   loading: false,
+  error: null,
 
   fetchMeetings: async () => {
-    set({ loading: true });
+    set({ loading: true, error: null });
     try {
       const res = await fetch("/api/meetings");
+      if (!res.ok) throw new Error("Failed to load meetings");
       const data = await res.json();
       set({ meetings: data.meetings || [], loading: false });
-    } catch {
-      set({ loading: false });
+    } catch (err) {
+      set({
+        loading: false,
+        error: err instanceof Error ? err.message : "Failed to load meetings",
+      });
     }
   },
 
   fetchFolders: async () => {
     try {
       const res = await fetch("/api/folders");
+      if (!res.ok) throw new Error("Failed to load folders");
       const data = await res.json();
       set({ folders: data.folders || [] });
     } catch {
-      // silently fail
+      // folders are secondary data; silently fail
     }
   },
 
@@ -60,12 +67,14 @@ export const useAppStore = create<AppState>((set) => ({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, color }),
     });
+    if (!res.ok) throw new Error("Failed to create folder");
     const folder = await res.json();
     set((state) => ({ folders: [...state.folders, folder] }));
   },
 
   deleteFolder: async (id) => {
-    await fetch(`/api/folders/${id}`, { method: "DELETE" });
+    const res = await fetch(`/api/folders/${id}`, { method: "DELETE" });
+    if (!res.ok) throw new Error("Failed to delete folder");
     set((state) => ({ folders: state.folders.filter((f) => f.id !== id) }));
   },
 }));

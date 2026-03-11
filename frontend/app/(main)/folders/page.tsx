@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { FolderOpen, Plus, Trash2 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
+import { LoadingSpinner } from "@/components/loading-spinner";
+import { EmptyState } from "@/components/empty-state";
+import { useToast } from "@/components/toast";
 
 const PRESET_COLORS = [
   "#4CAF50",
@@ -17,10 +20,12 @@ const PRESET_COLORS = [
 export default function FoldersPage() {
   const folders = useAppStore((s) => s.folders);
   const meetings = useAppStore((s) => s.meetings);
+  const loading = useAppStore((s) => s.loading);
   const fetchFolders = useAppStore((s) => s.fetchFolders);
   const fetchMeetings = useAppStore((s) => s.fetchMeetings);
   const addFolder = useAppStore((s) => s.addFolder);
   const deleteFolder = useAppStore((s) => s.deleteFolder);
+  const { success, error: toastError } = useToast();
 
   const [showForm, setShowForm] = useState(false);
   const [newName, setNewName] = useState("");
@@ -44,8 +49,9 @@ export default function FoldersPage() {
       setNewName("");
       setNewColor(PRESET_COLORS[0]);
       setShowForm(false);
+      success("Folder created.");
     } catch {
-      // silently fail
+      toastError("Failed to create folder. Please try again.");
     } finally {
       setCreating(false);
     }
@@ -53,7 +59,12 @@ export default function FoldersPage() {
 
   async function handleDelete(id: string, name: string) {
     if (!window.confirm(`Delete folder "${name}"? Meetings will not be deleted.`)) return;
-    await deleteFolder(id);
+    try {
+      await deleteFolder(id);
+      success(`Folder "${name}" deleted.`);
+    } catch {
+      toastError("Failed to delete folder. Please try again.");
+    }
   }
 
   return (
@@ -122,15 +133,23 @@ export default function FoldersPage() {
       )}
 
       {/* Folders list */}
-      {folders.length === 0 ? (
-        <div className="flex items-center justify-center py-20">
-          <div className="text-center">
-            <FolderOpen size={40} className="mx-auto mb-3 text-gray-600" />
-            <p className="text-sm text-gray-500">
-              No folders yet. Create one to organize your meetings.
-            </p>
-          </div>
-        </div>
+      {loading ? (
+        <LoadingSpinner message="Loading folders..." />
+      ) : folders.length === 0 ? (
+        <EmptyState
+          icon={<FolderOpen size={40} className="text-gray-600" />}
+          message="No folders yet"
+          description="Create one to organize your meetings."
+          action={
+            <button
+              onClick={() => setShowForm(true)}
+              className="inline-flex items-center gap-2 rounded-lg bg-[#64b5f6] px-4 py-2 text-sm font-medium text-[#0f0f1a] transition-colors hover:bg-[#64b5f6]/80"
+            >
+              <Plus size={16} />
+              New Folder
+            </button>
+          }
+        />
       ) : (
         <div className="flex flex-col gap-2">
           {folders.map((folder) => {

@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Save, Users } from "lucide-react";
+import { LoadingSpinner } from "@/components/loading-spinner";
+import { ErrorState } from "@/components/error-state";
+import { useToast } from "@/components/toast";
 
 interface Settings {
   whisper_model: string;
@@ -20,6 +23,7 @@ const WHISPER_MODELS = [
 ];
 
 export default function SettingsPage() {
+  const { success, error: toastError } = useToast();
   const [settings, setSettings] = useState<Settings>({
     whisper_model: "base",
     openai_api_key: "",
@@ -27,27 +31,34 @@ export default function SettingsPage() {
     google_drive_folder_id: "",
   });
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
 
-  useEffect(() => {
+  function loadSettings() {
+    setLoading(true);
+    setLoadError(null);
     fetch("/api/settings")
       .then((res) => {
-        if (!res.ok) throw new Error("Failed");
+        if (!res.ok) throw new Error("Failed to load settings");
         return res.json();
       })
       .then((data) => {
         setSettings((prev) => ({ ...prev, ...data }));
       })
-      .catch(() => {
-        // use defaults
+      .catch((err) => {
+        setLoadError(
+          err instanceof Error ? err.message : "Failed to load settings"
+        );
       })
       .finally(() => setLoading(false));
+  }
+
+  useEffect(() => {
+    loadSettings();
   }, []);
 
   async function handleSave() {
     setSaving(true);
-    setSaved(false);
     try {
       const res = await fetch("/api/settings", {
         method: "PUT",
@@ -55,25 +66,23 @@ export default function SettingsPage() {
         body: JSON.stringify(settings),
       });
       if (res.ok) {
-        setSaved(true);
-        setTimeout(() => setSaved(false), 3000);
+        success("Settings saved.");
+      } else {
+        toastError("Failed to save settings.");
       }
     } catch {
-      // silently fail
+      toastError("Network error. Could not save settings.");
     } finally {
       setSaving(false);
     }
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-center">
-          <div className="mb-3 h-8 w-8 mx-auto animate-spin rounded-full border-2 border-gray-600 border-t-[#64b5f6]" />
-          <p className="text-sm text-gray-400">Loading settings...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner message="Loading settings..." />;
+  }
+
+  if (loadError) {
+    return <ErrorState message={loadError} onRetry={loadSettings} />;
   }
 
   return (
@@ -187,9 +196,6 @@ export default function SettingsPage() {
             <Save size={16} />
             {saving ? "Saving..." : "Save Settings"}
           </button>
-          {saved && (
-            <span className="text-sm text-green-400">Settings saved.</span>
-          )}
         </div>
       </div>
     </div>

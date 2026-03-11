@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { AudioRecorder } from "@/components/audio-recorder";
 import { UploadProgress } from "@/components/upload-progress";
+import { useToast } from "@/components/toast";
 
 export default function RecorderPage() {
+  const { error: toastError } = useToast();
   const [title, setTitle] = useState("Untitled Meeting");
   const [state, setState] = useState<"recording" | "uploading">("recording");
   const [jobId, setJobId] = useState<string | null>(null);
@@ -27,7 +29,9 @@ export default function RecorderPage() {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({ detail: "Upload failed" }));
-        setUploadError(err.detail || "Upload failed");
+        const msg = err.detail || "Upload failed";
+        setUploadError(msg);
+        toastError(msg);
         return;
       }
 
@@ -35,7 +39,9 @@ export default function RecorderPage() {
       setJobId(data.job_id);
       setState("uploading");
     } catch {
-      setUploadError("Network error. Please try again.");
+      const msg = "Network error. Please try again.";
+      setUploadError(msg);
+      toastError(msg);
     }
   }
 
