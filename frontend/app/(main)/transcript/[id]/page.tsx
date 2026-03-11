@@ -6,6 +6,12 @@ import Link from "next/link";
 import { AudioPlayer } from "@/components/audio-player";
 import { TranscriptSegment } from "@/components/transcript-segment";
 import { SummaryPanel } from "@/components/summary-panel";
+import {
+  exportTXT,
+  exportSRT,
+  exportPDF,
+  downloadFile,
+} from "@/lib/export";
 
 const SPEAKER_COLORS = [
   "#4CAF50",
@@ -69,6 +75,11 @@ export default function TranscriptViewerPage() {
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
   const [exportOpen, setExportOpen] = useState(false);
+  const [summaryData, setSummaryData] = useState<{
+    summary: string;
+    action_items: { text: string; assignee: string }[];
+    keywords: string[];
+  } | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -89,6 +100,19 @@ export default function TranscriptViewerPage() {
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
+      });
+
+    // Fetch summary for PDF export
+    fetch(`/api/meetings/${id}/summary`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed");
+        return res.json();
+      })
+      .then((data) => {
+        if (!cancelled) setSummaryData(data);
+      })
+      .catch(() => {
+        // summary is optional
       });
 
     return () => {
@@ -228,15 +252,41 @@ export default function TranscriptViewerPage() {
                 </button>
                 {exportOpen && (
                   <div className="absolute right-0 top-full mt-1 z-10 w-32 rounded-lg border border-[rgba(255,255,255,0.08)] bg-[#1a1a2e] py-1 shadow-xl">
-                    {["TXT", "SRT", "PDF"].map((fmt) => (
-                      <button
-                        key={fmt}
-                        onClick={() => setExportOpen(false)}
-                        className="block w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-[rgba(255,255,255,0.08)]"
-                      >
-                        Export as {fmt}
-                      </button>
-                    ))}
+                    <button
+                      onClick={() => {
+                        const speakerMap = Object.fromEntries(speakers.map((s) => [s, s]));
+                        const txt = exportTXT({ ...meeting, speakers: speakerMap });
+                        downloadFile(txt, `${meeting.title || "transcript"}.txt`, "text/plain");
+                        setExportOpen(false);
+                      }}
+                      className="block w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-[rgba(255,255,255,0.08)]"
+                    >
+                      Export as TXT
+                    </button>
+                    <button
+                      onClick={() => {
+                        const speakerMap = Object.fromEntries(speakers.map((s) => [s, s]));
+                        const srt = exportSRT({ ...meeting, speakers: speakerMap });
+                        downloadFile(srt, `${meeting.title || "transcript"}.srt`, "text/srt");
+                        setExportOpen(false);
+                      }}
+                      className="block w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-[rgba(255,255,255,0.08)]"
+                    >
+                      Export as SRT
+                    </button>
+                    <button
+                      onClick={() => {
+                        const speakerMap = Object.fromEntries(speakers.map((s) => [s, s]));
+                        exportPDF(
+                          { ...meeting, speakers: speakerMap },
+                          summaryData || undefined
+                        );
+                        setExportOpen(false);
+                      }}
+                      className="block w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-[rgba(255,255,255,0.08)]"
+                    >
+                      Export as PDF
+                    </button>
                   </div>
                 )}
               </div>
