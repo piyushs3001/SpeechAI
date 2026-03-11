@@ -1,3 +1,10 @@
 .claude
 .superpowers/
 docs/
+node_modules/
+.next/
+__pycache__/
+*.pyc
+.env
+service-account.json
+backend/models/
