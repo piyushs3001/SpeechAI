@@ -1,30 +1,27 @@
 import json
 
-from google.oauth2 import service_account
+from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaInMemoryUpload, MediaIoBaseDownload
 
-from config import GOOGLE_SERVICE_ACCOUNT_KEY_PATH, GOOGLE_DRIVE_FOLDER_ID
+from config import GOOGLE_DRIVE_FOLDER_ID
 
-SCOPES = ["https://www.googleapis.com/auth/drive"]
+SCOPES = ["https://www.googleapis.com/auth/drive.file"]
+
+
+def get_drive_service(access_token: str):
+    """Build a Drive service using the user's OAuth access token."""
+    creds = Credentials(token=access_token)
+    return build("drive", "v3", credentials=creds)
 
 
 class DriveClient:
-    _instance = None
+    """Drive client that uses the user's OAuth access token."""
 
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-            creds = service_account.Credentials.from_service_account_file(
-                GOOGLE_SERVICE_ACCOUNT_KEY_PATH, scopes=SCOPES
-            )
-            cls._instance.service = build("drive", "v3", credentials=creds)
-            cls._instance.root_folder_id = GOOGLE_DRIVE_FOLDER_ID
-            cls._instance._folder_cache = {}
-        return cls._instance
-
-    def __init__(self):
-        pass  # Initialization handled in __new__ for singleton
+    def __init__(self, access_token: str):
+        self.service = get_drive_service(access_token)
+        self.root_folder_id = GOOGLE_DRIVE_FOLDER_ID
+        self._folder_cache: dict[str, str] = {}
 
     def ensure_subfolder(self, path: str) -> str:
         """Ensure a subfolder exists, creating it if necessary.

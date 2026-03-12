@@ -87,7 +87,16 @@ export function SummaryPanel({ meetingId }: SummaryPanelProps) {
     );
   }
 
-  const allSpeakers = data.speaker_stats?.map((s) => s.speaker) ?? [];
+  // speaker_stats can be an object {S1: {...}} or an array [{speaker: "S1", ...}]
+  const speakerStatsArray = Array.isArray(data.speaker_stats)
+    ? data.speaker_stats
+    : data.speaker_stats
+      ? Object.entries(data.speaker_stats).map(([key, val]) => ({
+          speaker: key,
+          ...(val as Record<string, unknown>),
+        }))
+      : [];
+  const allSpeakers = speakerStatsArray.map((s) => s.speaker);
 
   return (
     <div className="flex flex-col gap-5">
@@ -155,13 +164,13 @@ export function SummaryPanel({ meetingId }: SummaryPanelProps) {
       )}
 
       {/* Speaker Stats */}
-      {data.speaker_stats && data.speaker_stats.length > 0 && (
+      {speakerStatsArray.length > 0 && (
         <section>
           <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
             Speaker Stats
           </h3>
           <div className="flex flex-col gap-2.5">
-            {data.speaker_stats.map((stat) => {
+            {speakerStatsArray.map((stat) => {
               const color = getSpeakerColor(stat.speaker, allSpeakers);
               return (
                 <div key={stat.speaker}>

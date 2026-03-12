@@ -41,7 +41,25 @@ export const useAppStore = create<AppState>((set) => ({
       const res = await fetch("/api/meetings");
       if (!res.ok) throw new Error("Failed to load meetings");
       const data = await res.json();
-      set({ meetings: data.meetings || [], loading: false });
+      // Map backend fields to frontend Meeting interface
+      const meetings = (data.meetings || []).map(
+        (m: Record<string, unknown>) => ({
+          id: m.meeting_id || m.id,
+          title: m.title || "Untitled",
+          date: m.created_at || m.date || "",
+          duration: m.duration || 0,
+          speakers: m.speakers
+            ? Array.isArray(m.speakers)
+              ? m.speakers
+              : Object.values(m.speakers)
+            : [],
+          has_summary: !!m.summary || !!m.has_summary,
+          action_item_count: m.action_item_count || 0,
+          folder_id: m.folder || m.folder_id || null,
+          status: m.status || "complete",
+        })
+      );
+      set({ meetings, loading: false });
     } catch (err) {
       set({
         loading: false,

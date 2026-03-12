@@ -17,13 +17,15 @@ interface JobStatus {
 }
 
 const STEP_LABELS: Record<string, string> = {
-  uploading: "Uploading",
-  transcribing: "Transcribing",
+  uploading: "Uploading to Drive",
+  transcribing: "Transcribing audio",
   diarizing: "Identifying speakers",
+  aligning: "Aligning segments",
   summarizing: "Generating summary",
-  saving: "Saving",
+  saving: "Saving results",
   queued: "Queued",
-  completed: "Completed",
+  complete: "Complete",
+  completed: "Complete",
   failed: "Failed",
 };
 
@@ -84,7 +86,7 @@ export function UploadProgress({ jobId }: UploadProgressProps) {
         if (res.ok) {
           const data = await res.json();
           setStatus(data);
-          if (data.status !== "completed" && data.status !== "failed") {
+          if (data.status !== "complete" && data.status !== "completed" && data.status !== "failed") {
             setTimeout(pollStatus, 2000);
           }
         }
@@ -100,9 +102,9 @@ export function UploadProgress({ jobId }: UploadProgressProps) {
     };
   }, [jobId]);
 
-  const isComplete = status.status === "completed";
+  const isComplete = status.status === "complete" || status.status === "completed";
   const isFailed = status.status === "failed";
-  const stepLabel = STEP_LABELS[status.step] || STEP_LABELS[status.status] || status.step;
+  const stepLabel = STEP_LABELS[status.status] || STEP_LABELS[status.step] || status.status || "Processing";
   const meetingId = status.meeting_id || jobId;
 
   return (

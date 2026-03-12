@@ -9,7 +9,7 @@ class SpeakerDiarizer:
         if SpeakerDiarizer._instance is None:
             SpeakerDiarizer._instance = Pipeline.from_pretrained(
                 "pyannote/speaker-diarization-3.1",
-                use_auth_token=HF_AUTH_TOKEN,
+                token=HF_AUTH_TOKEN,
             )
         self.pipeline = SpeakerDiarizer._instance
 

@@ -23,6 +23,7 @@ class JobStatus(str, Enum):
 class Job:
     id: str
     meeting_id: str
+    access_token: str = ""
     status: JobStatus = JobStatus.QUEUED
     progress: float = 0.0
     error: Optional[str] = None

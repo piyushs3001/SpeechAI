@@ -39,11 +39,16 @@ async def process_job(job: Job):
     from drive_client import DriveClient
 
     tmp_dir = tempfile.gettempdir()
-    local_audio_path = os.path.join(tmp_dir, f"{job.meeting_id}_upload")
+    # Find the upload file (has extension preserved from upload)
+    import glob
+    matches = glob.glob(os.path.join(tmp_dir, f"{job.meeting_id}_upload*"))
+    if not matches:
+        raise RuntimeError(f"Upload file not found for {job.meeting_id}")
+    local_audio_path = matches[0]
     wav_path = None
 
     try:
-        drive = DriveClient()
+        drive = DriveClient(job.access_token)
 
         # Step 1: Upload to Drive
         job.status = JobStatus.UPLOADING

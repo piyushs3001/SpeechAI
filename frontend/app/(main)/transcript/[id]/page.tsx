@@ -37,7 +37,7 @@ interface MeetingDetail {
   title: string;
   date: string;
   duration: number;
-  speakers: string[];
+  speakers: string[] | Record<string, string>;
   segments: Segment[];
   audio_drive_id?: string;
   has_summary: boolean;
@@ -98,7 +98,15 @@ export default function TranscriptViewerPage() {
         return res.json();
       })
       .then((data) => {
-        if (!cancelled) setMeeting(data);
+        if (!cancelled)
+          setMeeting({
+            ...data,
+            id: data.meeting_id || data.id,
+            date: data.created_at || data.date || "",
+            duration: data.duration || 0,
+            has_summary: !!data.summary,
+            audio_drive_id: data.audio_file_id || data.audio_drive_id,
+          });
       })
       .catch((err) => {
         if (!cancelled)
@@ -185,7 +193,10 @@ export default function TranscriptViewerPage() {
   }
 
   const segments = meeting.segments ?? [];
-  const speakers = meeting.speakers ?? [];
+  const speakersRaw = meeting.speakers ?? [];
+  const speakers: string[] = Array.isArray(speakersRaw)
+    ? speakersRaw
+    : Object.keys(speakersRaw);
   const audioUrl = meeting.audio_drive_id
     ? `/api/audio/${meeting.audio_drive_id}`
     : "";

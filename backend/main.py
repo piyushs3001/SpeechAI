@@ -6,7 +6,7 @@ import tempfile
 from contextlib import asynccontextmanager
 from typing import Optional
 
-from fastapi import FastAPI, UploadFile, File, HTTPException, Query
+from fastapi import FastAPI, UploadFile, File, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
@@ -49,16 +49,19 @@ async def health():
 
 
 @app.post("/api/upload")
-async def upload_file(file: UploadFile = File(...)):
+async def upload_file(request: Request, file: UploadFile = File(...)):
     meeting_id = generate_meeting_id()
     job_id = meeting_id
 
-    tmp_path = os.path.join(tempfile.gettempdir(), f"{meeting_id}_upload")
+    # Preserve file extension so ffmpeg can detect format
+    ext = os.path.splitext(file.filename or "")[1] or ".audio"
+    tmp_path = os.path.join(tempfile.gettempdir(), f"{meeting_id}_upload{ext}")
     with open(tmp_path, "wb") as f:
         while chunk := await file.read(1024 * 1024):
             f.write(chunk)
 
-    job = Job(id=job_id, meeting_id=meeting_id)
+    access_token = _get_token(request)
+    job = Job(id=job_id, meeting_id=meeting_id, access_token=access_token)
     job_queue.add_job(job)
 
     return {
@@ -119,16 +122,27 @@ async def stream_job_progress(job_id: str):
 # ---------------------------------------------------------------------------
 
 
-def _get_drive():
-    """Lazy import to avoid errors when Google credentials aren't available."""
+def _get_token(request: Request) -> str:
+    """Extract Bearer token from Authorization header."""
+    auth = request.headers.get("Authorization", "")
+    if not auth.startswith("Bearer "):
+        logger.error("No Authorization header found in request")
+        raise HTTPException(status_code=401, detail="Missing access token")
+    token = auth[7:]
+    logger.info(f"Got access token: {token[:20]}...")
+    return token
+
+
+def _get_drive(request: Request):
+    """Create a DriveClient using the user's OAuth access token."""
     from drive_client import DriveClient
-    return DriveClient()
+    return DriveClient(_get_token(request))
 
 
 @app.get("/api/meetings")
-async def list_meetings():
+async def list_meetings(request: Request):
     try:
-        drive = _get_drive()
+        drive = _get_drive(request)
         files = drive.list_files("metadata/meetings")
         meetings = []
         for f in files:
@@ -150,9 +164,9 @@ async def list_meetings():
 
 
 @app.get("/api/meetings/{meeting_id}")
-async def get_meeting(meeting_id: str):
+async def get_meeting(meeting_id: str, request: Request):
     try:
-        drive = _get_drive()
+        drive = _get_drive(request)
         file_id = drive.find_file(f"{meeting_id}.json", "metadata/meetings")
         if not file_id:
             raise HTTPException(status_code=404, detail="Meeting not found")
@@ -165,9 +179,9 @@ async def get_meeting(meeting_id: str):
 
 
 @app.get("/api/meetings/{meeting_id}/summary")
-async def get_meeting_summary(meeting_id: str):
+async def get_meeting_summary(meeting_id: str, request: Request):
     try:
-        drive = _get_drive()
+        drive = _get_drive(request)
         file_id = drive.find_file(f"{meeting_id}.json", "metadata/meetings")
         if not file_id:
             raise HTTPException(status_code=404, detail="Meeting not found")
@@ -186,9 +200,9 @@ class MeetingUpdate(BaseModel):
 
 
 @app.put("/api/meetings/{meeting_id}")
-async def update_meeting(meeting_id: str, update: MeetingUpdate):
+async def update_meeting(meeting_id: str, update: MeetingUpdate, request: Request):
     try:
-        drive = _get_drive()
+        drive = _get_drive(request)
         file_id = drive.find_file(f"{meeting_id}.json", "metadata/meetings")
         if not file_id:
             raise HTTPException(status_code=404, detail="Meeting not found")
@@ -227,9 +241,9 @@ def _save_folders_data(drive, file_id, data):
 
 
 @app.get("/api/folders")
-async def list_folders():
+async def list_folders(request: Request):
     try:
-        drive = _get_drive()
+        drive = _get_drive(request)
         _, data = _load_folders_data(drive)
         return data
     except Exception as e:
@@ -242,9 +256,9 @@ class FolderCreate(BaseModel):
 
 
 @app.post("/api/folders")
-async def create_folder(folder: FolderCreate):
+async def create_folder(folder: FolderCreate, request: Request):
     try:
-        drive = _get_drive()
+        drive = _get_drive(request)
         file_id, data = _load_folders_data(drive)
         import secrets
         new_folder = {
@@ -265,9 +279,9 @@ class FolderUpdate(BaseModel):
 
 
 @app.put("/api/folders/{folder_id}")
-async def update_folder(folder_id: str, update: FolderUpdate):
+async def update_folder(folder_id: str, update: FolderUpdate, request: Request):
     try:
-        drive = _get_drive()
+        drive = _get_drive(request)
         file_id, data = _load_folders_data(drive)
         for f in data["folders"]:
             if f["id"] == folder_id:
@@ -285,9 +299,9 @@ async def update_folder(folder_id: str, update: FolderUpdate):
 
 
 @app.delete("/api/folders/{folder_id}")
-async def delete_folder(folder_id: str):
+async def delete_folder(folder_id: str, request: Request):
     try:
-        drive = _get_drive()
+        drive = _get_drive(request)
         file_id, data = _load_folders_data(drive)
         original_len = len(data["folders"])
         data["folders"] = [f for f in data["folders"] if f["id"] != folder_id]
@@ -307,9 +321,9 @@ async def delete_folder(folder_id: str):
 
 
 @app.get("/api/search-index")
-async def get_search_index():
+async def get_search_index(request: Request):
     try:
-        drive = _get_drive()
+        drive = _get_drive(request)
         file_id = drive.find_file("search_index.json", "metadata")
         if not file_id:
             return {"entries": []}
@@ -337,9 +351,9 @@ def _load_settings(drive):
 
 
 @app.get("/api/settings")
-async def get_settings():
+async def get_settings(request: Request):
     try:
-        drive = _get_drive()
+        drive = _get_drive(request)
         _, settings = _load_settings(drive)
         return settings
     except Exception as e:
@@ -347,9 +361,9 @@ async def get_settings():
 
 
 @app.put("/api/settings")
-async def update_settings(settings: dict):
+async def update_settings(settings: dict, request: Request):
     try:
-        drive = _get_drive()
+        drive = _get_drive(request)
         file_id, _ = _load_settings(drive)
         if file_id:
             drive.update_json(file_id, settings)
@@ -374,9 +388,9 @@ def _load_team(drive):
 
 
 @app.get("/api/team")
-async def get_team():
+async def get_team(request: Request):
     try:
-        drive = _get_drive()
+        drive = _get_drive(request)
         _, team = _load_team(drive)
         return team
     except Exception as e:
@@ -384,9 +398,9 @@ async def get_team():
 
 
 @app.put("/api/team")
-async def update_team(team: dict):
+async def update_team(team: dict, request: Request):
     try:
-        drive = _get_drive()
+        drive = _get_drive(request)
         file_id, _ = _load_team(drive)
         if file_id:
             drive.update_json(file_id, team)
