@@ -140,3 +140,47 @@ class DriveClient:
         )
         files = results.get("files", [])
         return files[0]["id"] if files else None
+
+    def find_file_in_folder_id(self, filename: str, folder_id: str) -> str | None:
+        """Find a file by name directly inside a known folder ID. Returns file_id or None."""
+        query = (
+            f"name='{filename}' and '{folder_id}' in parents and trashed=false"
+        )
+        results = (
+            self.service.files().list(q=query, fields="files(id)").execute()
+        )
+        files = results.get("files", [])
+        return files[0]["id"] if files else None
+
+    def create_folder(self, name: str, parent_subfolder: str | None = None) -> str:
+        """Create a real Drive folder under parent_subfolder (or root if None).
+        Returns the new folder's Drive ID."""
+        parent_id = (
+            self.ensure_subfolder(parent_subfolder)
+            if parent_subfolder
+            else self.root_folder_id
+        )
+        metadata = {
+            "name": name,
+            "mimeType": "application/vnd.google-apps.folder",
+            "parents": [parent_id],
+        }
+        folder = (
+            self.service.files().create(body=metadata, fields="id").execute()
+        )
+        return folder["id"]
+
+    def delete_item(self, file_id: str) -> None:
+        """Permanently delete a file or folder from Drive by its ID."""
+        self.service.files().delete(fileId=file_id).execute()
+
+    def list_folder_children(self, folder_id: str) -> list[dict]:
+        """List immediate children (files and folders) of a known folder ID.
+        Returns list of {id, name, mimeType}."""
+        query = f"'{folder_id}' in parents and trashed=false"
+        results = (
+            self.service.files()
+            .list(q=query, fields="files(id, name, mimeType)")
+            .execute()
+        )
+        return results.get("files", [])

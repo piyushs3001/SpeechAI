@@ -139,16 +139,65 @@ def _get_drive(request: Request):
     return DriveClient(_get_token(request))
 
 
+def _find_meeting_json(drive, meeting_id: str) -> tuple[str | None, str | None]:
+    """Search all per-meeting folders for the given meeting_id's meeting.json.
+    Returns (file_id, drive_subfolder) or (None, None) if not found.
+
+    Searches:
+      meetings/{meeting_id}/meeting.json
+      {any_folder}/{meeting_id}/meeting.json
+    """
+    MIME_FOLDER = "application/vnd.google-apps.folder"
+    SKIP_FOLDERS = {"metadata"}
+
+    root_children = drive.list_folder_children(drive.root_folder_id)
+    for item in root_children:
+        if item.get("mimeType") != MIME_FOLDER:
+            continue
+        if item["name"] in SKIP_FOLDERS:
+            continue
+        # Look for a subfolder named meeting_id
+        query = (
+            f"name='{meeting_id}' and '{item['id']}' in parents "
+            f"and mimeType='application/vnd.google-apps.folder' and trashed=false"
+        )
+        results = drive.service.files().list(q=query, fields="files(id)").execute()
+        folders = results.get("files", [])
+        if not folders:
+            continue
+        meeting_folder_id = folders[0]["id"]
+        file_id = drive.find_file_in_folder_id("meeting.json", meeting_folder_id)
+        if file_id:
+            subfolder = f"{item['name']}/{meeting_id}"
+            return file_id, subfolder
+    return None, None
+
+
 @app.get("/api/meetings")
 async def list_meetings(request: Request):
     try:
         drive = _get_drive(request)
-        files = drive.list_files("metadata/meetings")
         meetings = []
-        for f in files:
-            if f["name"].endswith(".json"):
+
+        MIME_FOLDER = "application/vnd.google-apps.folder"
+        SKIP_FOLDERS = {"metadata"}
+
+        root_children = drive.list_folder_children(drive.root_folder_id)
+        for item in root_children:
+            if item.get("mimeType") != MIME_FOLDER:
+                continue
+            if item["name"] in SKIP_FOLDERS:
+                continue
+            # Each child of this folder should be a per-meeting subfolder
+            meeting_folders = drive.list_folder_children(item["id"])
+            for mf in meeting_folders:
+                if mf.get("mimeType") != MIME_FOLDER:
+                    continue
+                file_id = drive.find_file_in_folder_id("meeting.json", mf["id"])
+                if not file_id:
+                    continue
                 try:
-                    data = drive.read_json(f["id"])
+                    data = drive.read_json(file_id)
                     meetings.append({
                         "meeting_id": data.get("meeting_id"),
                         "title": data.get("title"),
@@ -158,6 +207,7 @@ async def list_meetings(request: Request):
                     })
                 except Exception:
                     continue
+
         return {"meetings": meetings}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -167,7 +217,7 @@ async def list_meetings(request: Request):
 async def get_meeting(meeting_id: str, request: Request):
     try:
         drive = _get_drive(request)
-        file_id = drive.find_file(f"{meeting_id}.json", "metadata/meetings")
+        file_id, _ = _find_meeting_json(drive, meeting_id)
         if not file_id:
             raise HTTPException(status_code=404, detail="Meeting not found")
         data = drive.read_json(file_id)
@@ -182,7 +232,7 @@ async def get_meeting(meeting_id: str, request: Request):
 async def get_meeting_summary(meeting_id: str, request: Request):
     try:
         drive = _get_drive(request)
-        file_id = drive.find_file(f"{meeting_id}.json", "metadata/meetings")
+        file_id, _ = _find_meeting_json(drive, meeting_id)
         if not file_id:
             raise HTTPException(status_code=404, detail="Meeting not found")
         data = drive.read_json(file_id)
@@ -203,7 +253,7 @@ class MeetingUpdate(BaseModel):
 async def update_meeting(meeting_id: str, update: MeetingUpdate, request: Request):
     try:
         drive = _get_drive(request)
-        file_id = drive.find_file(f"{meeting_id}.json", "metadata/meetings")
+        file_id, _ = _find_meeting_json(drive, meeting_id)
         if not file_id:
             raise HTTPException(status_code=404, detail="Meeting not found")
         data = drive.read_json(file_id)
@@ -261,10 +311,13 @@ async def create_folder(folder: FolderCreate, request: Request):
         drive = _get_drive(request)
         file_id, data = _load_folders_data(drive)
         import secrets
+        # Create a real Drive folder at the root of SpeechAI
+        drive_folder_id = drive.create_folder(folder.name)
         new_folder = {
             "id": secrets.token_hex(4),
             "name": folder.name,
             "color": folder.color,
+            "drive_folder_id": drive_folder_id,
         }
         data["folders"].append(new_folder)
         _save_folders_data(drive, file_id, data)
@@ -286,6 +339,14 @@ async def update_folder(folder_id: str, update: FolderUpdate, request: Request):
         for f in data["folders"]:
             if f["id"] == folder_id:
                 if update.name is not None:
+                    # Rename the real Drive folder if we have its ID
+                    drive_folder_id = f.get("drive_folder_id")
+                    if drive_folder_id and update.name != f["name"]:
+                        drive.service.files().update(
+                            fileId=drive_folder_id,
+                            body={"name": update.name},
+                            fields="id",
+                        ).execute()
                     f["name"] = update.name
                 if update.color is not None:
                     f["color"] = update.color
@@ -303,11 +364,20 @@ async def delete_folder(folder_id: str, request: Request):
     try:
         drive = _get_drive(request)
         file_id, data = _load_folders_data(drive)
-        original_len = len(data["folders"])
-        data["folders"] = [f for f in data["folders"] if f["id"] != folder_id]
-        if len(data["folders"]) == original_len:
+        target = next((f for f in data["folders"] if f["id"] == folder_id), None)
+        if target is None:
             raise HTTPException(status_code=404, detail="Folder not found")
+        data["folders"] = [f for f in data["folders"] if f["id"] != folder_id]
         _save_folders_data(drive, file_id, data)
+        # Delete the real Drive folder (and all its contents) if we have its ID
+        drive_folder_id = target.get("drive_folder_id")
+        if drive_folder_id:
+            try:
+                drive.delete_item(drive_folder_id)
+            except Exception as e:
+                logger.warning(
+                    f"Could not delete Drive folder {drive_folder_id}: {e}"
+                )
         return {"status": "deleted"}
     except HTTPException:
         raise

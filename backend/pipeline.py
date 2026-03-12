@@ -50,14 +50,27 @@ async def process_job(job: Job):
     try:
         drive = DriveClient(job.access_token)
 
+        # Determine the Drive subfolder for this meeting.
+        # Unfoldered meetings go under meetings/{meeting_id}/
+        # Foldered meetings go under {folder_name}/{meeting_id}/
+        folder_name = getattr(job, "folder_name", None)
+        if folder_name:
+            meeting_subfolder = f"{folder_name}/{job.meeting_id}"
+        else:
+            meeting_subfolder = f"meetings/{job.meeting_id}"
+
+        # Derive a friendly filename from the original upload extension
+        ext = os.path.splitext(local_audio_path)[1] or ""
+        audio_filename = f"audio_original{ext}"
+
         # Step 1: Upload to Drive
         job.status = JobStatus.UPLOADING
         job.progress = 5.0
         audio_file_id = await _retry_drive_op(
             drive.upload_file,
             local_audio_path,
-            f"{job.meeting_id}_original",
-            f"meetings/{job.meeting_id}",
+            audio_filename,
+            meeting_subfolder,
             "audio/mpeg",
         )
 
@@ -118,17 +131,18 @@ async def process_job(job: Job):
             "title": job.meeting_id,
             "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "audio_file_id": audio_file_id,
+            "drive_subfolder": meeting_subfolder,
             "segments": aligned,
             "summary": summary_data,
             "speakers": speakers,
-            "folder": None,
+            "folder": folder_name,
         }
 
         await _retry_drive_op(
             drive.upload_json,
             meeting_data,
-            f"{job.meeting_id}.json",
-            "metadata/meetings",
+            "meeting.json",
+            meeting_subfolder,
         )
 
         # Rebuild search index
@@ -159,30 +173,70 @@ async def process_job(job: Job):
 
 
 async def _rebuild_search_index(drive):
-    """Rebuild the search index from all meeting metadata files."""
-    files = drive.list_files("metadata/meetings")
+    """Rebuild the search index by scanning per-meeting folders.
+
+    Meetings are stored as:
+      meetings/{meeting_id}/meeting.json          (unfoldered)
+      {folder_name}/{meeting_id}/meeting.json     (foldered)
+
+    We enumerate top-level folders in the SpeechAI root, then for each
+    non-metadata folder we look one level deeper for meeting.json files.
+    """
     index_entries = []
 
-    for f in files:
-        if not f["name"].endswith(".json"):
-            continue
-        try:
-            data = drive.read_json(f["id"])
-            text_content = " ".join(
-                seg.get("text", "") for seg in data.get("segments", [])
-            )
-            index_entries.append({
-                "meeting_id": data.get("meeting_id", ""),
-                "title": data.get("title", ""),
-                "created_at": data.get("created_at", ""),
-                "text": text_content,
-                "keywords": data.get("summary", {}).get("keywords", []),
-            })
-        except Exception as e:
-            logger.warning(f"Failed to index {f['name']}: {e}")
+    # List all items directly under root
+    root_children = await asyncio.to_thread(
+        drive.list_folder_children, drive.root_folder_id
+    )
 
-    existing_id = drive.find_file("search_index.json", "metadata")
+    MIME_FOLDER = "application/vnd.google-apps.folder"
+    SKIP_FOLDERS = {"metadata"}
+
+    for item in root_children:
+        if item.get("mimeType") != MIME_FOLDER:
+            continue
+        if item["name"] in SKIP_FOLDERS:
+            continue
+
+        # Each child folder may be 'meetings' or a user-created folder.
+        # Either way, list its children (which should be per-meeting subfolders).
+        level1_children = await asyncio.to_thread(
+            drive.list_folder_children, item["id"]
+        )
+        for meeting_folder in level1_children:
+            if meeting_folder.get("mimeType") != MIME_FOLDER:
+                continue
+            # Look for meeting.json inside this per-meeting folder
+            file_id = await asyncio.to_thread(
+                drive.find_file_in_folder_id, "meeting.json", meeting_folder["id"]
+            )
+            if not file_id:
+                continue
+            try:
+                data = await asyncio.to_thread(drive.read_json, file_id)
+                text_content = " ".join(
+                    seg.get("text", "") for seg in data.get("segments", [])
+                )
+                index_entries.append({
+                    "meeting_id": data.get("meeting_id", ""),
+                    "title": data.get("title", ""),
+                    "created_at": data.get("created_at", ""),
+                    "text": text_content,
+                    "keywords": data.get("summary", {}).get("keywords", []),
+                })
+            except Exception as e:
+                logger.warning(
+                    f"Failed to index meeting in folder {meeting_folder['name']}: {e}"
+                )
+
+    existing_id = await asyncio.to_thread(
+        drive.find_file, "search_index.json", "metadata"
+    )
     if existing_id:
-        drive.update_json(existing_id, {"entries": index_entries})
+        await asyncio.to_thread(
+            drive.update_json, existing_id, {"entries": index_entries}
+        )
     else:
-        drive.upload_json({"entries": index_entries}, "search_index.json", "metadata")
+        await asyncio.to_thread(
+            drive.upload_json, {"entries": index_entries}, "search_index.json", "metadata"
+        )
