@@ -183,7 +183,7 @@ export default function TranscriptViewerPage() {
         action={
           <Link
             href="/dashboard"
-            className="inline-block text-sm text-[#64b5f6] hover:underline"
+            className="inline-block text-[13px] text-[#2563eb] hover:underline"
           >
             Back to Dashboard
           </Link>
@@ -210,23 +210,23 @@ export default function TranscriptViewerPage() {
       {/* Left panel */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
-        <div className="mb-4 shrink-0">
+        <div className="mb-5 shrink-0">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <h1 className="text-xl font-semibold text-white truncate">
+              <h1 className="text-lg font-semibold text-white truncate">
                 {meeting.title}
               </h1>
-              <p className="mt-1 text-sm text-gray-400">
+              <p className="mt-1 text-[13px] text-gray-500">
                 {formatDate(meeting.date)}
                 {meeting.duration > 0 && (
                   <>
-                    <span className="mx-1.5">·</span>
+                    <span className="mx-1.5 text-gray-600">·</span>
                     {formatDuration(meeting.duration)}
                   </>
                 )}
                 {speakers.length > 0 && (
                   <>
-                    <span className="mx-1.5">·</span>
+                    <span className="mx-1.5 text-gray-600">·</span>
                     {speakers.length} speaker{speakers.length !== 1 ? "s" : ""}
                   </>
                 )}
@@ -236,7 +236,7 @@ export default function TranscriptViewerPage() {
             <div className="flex items-center gap-2 shrink-0">
               <Link
                 href={`/transcript/${id}/edit`}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-[rgba(255,255,255,0.08)] px-3 py-1.5 text-sm font-medium text-gray-300 transition-colors hover:bg-[rgba(255,255,255,0.12)]"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-white/[0.06] px-3 py-1.5 text-[13px] font-medium text-gray-300 transition-colors hover:bg-white/[0.1]"
               >
                 <svg
                   width="14"
@@ -258,7 +258,7 @@ export default function TranscriptViewerPage() {
               <div className="relative">
                 <button
                   onClick={() => setExportOpen(!exportOpen)}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-[rgba(255,255,255,0.08)] px-3 py-1.5 text-sm font-medium text-gray-300 transition-colors hover:bg-[rgba(255,255,255,0.12)]"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-white/[0.06] px-3 py-1.5 text-[13px] font-medium text-gray-300 transition-colors hover:bg-white/[0.1]"
                 >
                   <svg
                     width="14"
@@ -287,7 +287,7 @@ export default function TranscriptViewerPage() {
                   </svg>
                 </button>
                 {exportOpen && (
-                  <div className="absolute right-0 top-full mt-1 z-10 w-32 rounded-lg border border-[rgba(255,255,255,0.08)] bg-[#1a1a2e] py-1 shadow-xl">
+                  <div className="absolute right-0 top-full mt-1 z-10 w-36 rounded-lg border border-white/5 bg-[#1a1a2e] py-1 shadow-xl">
                     <button
                       onClick={() => {
                         const speakerMap = Object.fromEntries(speakers.map((s) => [s, s]));
@@ -295,7 +295,7 @@ export default function TranscriptViewerPage() {
                         downloadFile(txt, `${meeting.title || "transcript"}.txt`, "text/plain");
                         setExportOpen(false);
                       }}
-                      className="block w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-[rgba(255,255,255,0.08)]"
+                      className="block w-full px-3 py-2 text-left text-[13px] text-gray-300 hover:bg-white/[0.06] transition-colors"
                     >
                       Export as TXT
                     </button>
@@ -306,7 +306,7 @@ export default function TranscriptViewerPage() {
                         downloadFile(srt, `${meeting.title || "transcript"}.srt`, "text/srt");
                         setExportOpen(false);
                       }}
-                      className="block w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-[rgba(255,255,255,0.08)]"
+                      className="block w-full px-3 py-2 text-left text-[13px] text-gray-300 hover:bg-white/[0.06] transition-colors"
                     >
                       Export as SRT
                     </button>
@@ -319,7 +319,7 @@ export default function TranscriptViewerPage() {
                         );
                         setExportOpen(false);
                       }}
-                      className="block w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-[rgba(255,255,255,0.08)]"
+                      className="block w-full px-3 py-2 text-left text-[13px] text-gray-300 hover:bg-white/[0.06] transition-colors"
                     >
                       Export as PDF
                     </button>
@@ -345,7 +345,7 @@ export default function TranscriptViewerPage() {
               className="py-10"
             />
           ) : (
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col">
               {segments.map((seg, i) => (
                 <TranscriptSegment
                   key={i}
@@ -362,7 +362,7 @@ export default function TranscriptViewerPage() {
       </div>
 
       {/* Right panel */}
-      <aside className="w-80 shrink-0 overflow-y-auto rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] p-4">
+      <aside className="w-80 shrink-0 overflow-y-auto rounded-xl border border-white/5 bg-white/[0.02] p-5">
         <SummaryPanel meetingId={id} />
       </aside>
     </div>

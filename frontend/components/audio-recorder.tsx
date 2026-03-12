@@ -47,7 +47,7 @@ function WaveformVisualizer({ analyserNode }: { analyserNode: AnalyserNode | nul
         const x = i * barWidth + gap / 2;
         const y = (canvas.height - barHeight) / 2;
 
-        ctx.fillStyle = `rgba(100, 181, 246, ${0.4 + value * 0.6})`;
+        ctx.fillStyle = `rgba(37, 99, 235, ${0.4 + value * 0.6})`;
         ctx.beginPath();
         ctx.roundRect(x, y, barWidth - gap, barHeight, 2);
         ctx.fill();
@@ -68,7 +68,7 @@ function WaveformVisualizer({ analyserNode }: { analyserNode: AnalyserNode | nul
         {Array.from({ length: 40 }).map((_, i) => (
           <div
             key={i}
-            className="w-1.5 rounded-sm bg-[rgba(255,255,255,0.08)]"
+            className="w-1.5 rounded-sm bg-white/[0.06]"
             style={{ height: 4 }}
           />
         ))}
@@ -123,17 +123,17 @@ export function AudioRecorder({ onRecordingComplete }: AudioRecorderProps) {
       <div className="flex items-center gap-2 h-6">
         {isRecording && (
           <>
-            <span className="h-2.5 w-2.5 rounded-full bg-red-500 animate-pulse" />
-            <span className="text-sm text-red-400">Recording...</span>
+            <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+            <span className="text-[13px] text-red-400">Recording...</span>
           </>
         )}
         {isPaused && (
-          <span className="text-sm text-yellow-400">Paused</span>
+          <span className="text-[13px] text-yellow-400">Paused</span>
         )}
       </div>
 
       {/* Timer */}
-      <div className="font-mono text-5xl text-white tabular-nums">
+      <div className="font-mono text-5xl text-white tabular-nums tracking-tight">
         {formatTime(duration)}
       </div>
 
@@ -148,7 +148,7 @@ export function AudioRecorder({ onRecordingComplete }: AudioRecorderProps) {
         {!isActive ? (
           <button
             onClick={handleRecord}
-            className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500 transition-colors hover:bg-green-400"
+            className="flex h-16 w-16 items-center justify-center rounded-full bg-[#2563eb] transition-colors hover:bg-[#2563eb]/80"
             aria-label="Start recording"
           >
             <span className="h-5 w-5 rounded-full bg-white" />
@@ -158,7 +158,7 @@ export function AudioRecorder({ onRecordingComplete }: AudioRecorderProps) {
             {/* Pause / Resume */}
             <button
               onClick={isPaused ? resume : pause}
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-[rgba(255,255,255,0.08)] transition-colors hover:bg-[rgba(255,255,255,0.15)]"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-white/[0.06] transition-colors hover:bg-white/[0.1]"
               aria-label={isPaused ? "Resume" : "Pause"}
             >
               {isPaused ? (
@@ -187,7 +187,7 @@ export function AudioRecorder({ onRecordingComplete }: AudioRecorderProps) {
 
       {/* Error */}
       {error && (
-        <p className="text-sm text-red-400">{error}</p>
+        <p className="text-[13px] text-red-400">{error}</p>
       )}
     </div>
   );

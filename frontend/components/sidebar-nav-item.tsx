@@ -17,10 +17,10 @@ export function SidebarNavItem({ href, icon, label }: SidebarNavItemProps) {
   return (
     <Link
       href={href}
-      className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+      className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium transition-colors ${
         isActive
-          ? "border-l-2 border-[#64b5f6] bg-[rgba(100,181,246,0.1)] text-[#64b5f6]"
-          : "text-gray-400 hover:bg-[rgba(255,255,255,0.04)] hover:text-white"
+          ? "bg-[#2563eb]/10 text-[#2563eb]"
+          : "text-gray-400 hover:bg-white/[0.04] hover:text-gray-200"
       }`}
     >
       <span className="flex h-5 w-5 shrink-0 items-center justify-center">

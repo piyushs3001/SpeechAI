@@ -70,10 +70,10 @@ export function SummaryPanel({ meetingId }: SummaryPanelProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-10">
+      <div className="flex items-center justify-center py-12">
         <div className="text-center">
-          <div className="mb-3 h-6 w-6 mx-auto animate-spin rounded-full border-2 border-gray-600 border-t-[#64b5f6]" />
-          <p className="text-xs text-gray-400">Loading summary...</p>
+          <div className="mb-3 h-5 w-5 mx-auto animate-spin rounded-full border-2 border-gray-700 border-t-[#2563eb]" />
+          <p className="text-[13px] text-gray-500">Loading summary...</p>
         </div>
       </div>
     );
@@ -81,8 +81,8 @@ export function SummaryPanel({ meetingId }: SummaryPanelProps) {
 
   if (error || !data) {
     return (
-      <div className="flex items-center justify-center py-10">
-        <p className="text-sm text-gray-500">No summary available</p>
+      <div className="flex items-center justify-center py-12">
+        <p className="text-[13px] text-gray-500">No summary available</p>
       </div>
     );
   }
@@ -99,37 +99,37 @@ export function SummaryPanel({ meetingId }: SummaryPanelProps) {
   const allSpeakers = speakerStatsArray.map((s) => s.speaker);
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col">
       {/* Meeting Summary */}
       {data.summary && (
-        <section>
-          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        <section className="pb-5 mb-5 border-b border-white/5">
+          <h3 className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
             Meeting Summary
           </h3>
-          <p className="text-sm leading-relaxed text-gray-300">{data.summary}</p>
+          <p className="text-[13px] leading-relaxed text-gray-300">{data.summary}</p>
         </section>
       )}
 
       {/* Action Items */}
       {data.action_items && data.action_items.length > 0 && (
-        <section>
-          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        <section className="pb-5 mb-5 border-b border-white/5">
+          <h3 className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
             Action Items
           </h3>
-          <ul className="flex flex-col gap-2">
+          <ul className="flex flex-col gap-2.5">
             {data.action_items.map((item, i) => (
-              <li key={i} className="flex items-start gap-2">
+              <li key={i} className="flex items-start gap-2.5">
                 <input
                   type="checkbox"
                   defaultChecked={item.done}
-                  className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-600 bg-transparent accent-[#64b5f6]"
+                  className="mt-0.5 h-3.5 w-3.5 shrink-0 rounded border-gray-600 bg-transparent accent-[#2563eb]"
                   readOnly
                 />
                 <div className="min-w-0">
-                  <p className="text-sm text-gray-300">{item.text}</p>
+                  <p className="text-[13px] text-gray-300">{item.text}</p>
                   {item.assignee && (
                     <span
-                      className="text-xs font-medium"
+                      className="text-[11px] font-medium"
                       style={{
                         color: getSpeakerColor(item.assignee, allSpeakers),
                       }}
@@ -146,15 +146,15 @@ export function SummaryPanel({ meetingId }: SummaryPanelProps) {
 
       {/* Keywords */}
       {data.keywords && data.keywords.length > 0 && (
-        <section>
-          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        <section className="pb-5 mb-5 border-b border-white/5">
+          <h3 className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
             Keywords
           </h3>
           <div className="flex flex-wrap gap-1.5">
             {data.keywords.map((kw) => (
               <span
                 key={kw}
-                className="rounded-full bg-[#64b5f6]/15 px-2.5 py-0.5 text-xs font-medium text-[#64b5f6]"
+                className="rounded-full bg-[#2563eb]/10 px-2.5 py-0.5 text-[11px] font-medium text-[#2563eb]"
               >
                 {kw}
               </span>
@@ -166,23 +166,23 @@ export function SummaryPanel({ meetingId }: SummaryPanelProps) {
       {/* Speaker Stats */}
       {speakerStatsArray.length > 0 && (
         <section>
-          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+          <h3 className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
             Speaker Stats
           </h3>
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col gap-3">
             {speakerStatsArray.map((stat) => {
               const color = getSpeakerColor(stat.speaker, allSpeakers);
               return (
                 <div key={stat.speaker}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-medium" style={{ color }}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[12px] font-medium" style={{ color }}>
                       {stat.speaker}
                     </span>
                     <span className="text-[11px] text-gray-500 tabular-nums">
                       {Math.round(stat.talk_time_pct)}%
                     </span>
                   </div>
-                  <div className="h-1.5 rounded-full bg-[rgba(255,255,255,0.08)]">
+                  <div className="h-1 rounded-full bg-white/[0.06]">
                     <div
                       className="h-full rounded-full transition-all"
                       style={{

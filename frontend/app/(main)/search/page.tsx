@@ -24,7 +24,7 @@ function highlightMatch(text: string, query: string): React.ReactNode {
   return (
     <>
       {text.slice(0, idx)}
-      <span className="font-semibold text-[#64b5f6]">
+      <span className="font-semibold text-[#2563eb]">
         {text.slice(idx, idx + query.length)}
       </span>
       {text.slice(idx + query.length)}
@@ -93,7 +93,7 @@ export default function SearchPage() {
       {/* Search input */}
       <div className="relative mb-6">
         <SearchIcon
-          size={20}
+          size={18}
           className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
         />
         <input
@@ -101,19 +101,19 @@ export default function SearchPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search across all your meeting transcripts..."
-          className="w-full rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] py-3.5 pl-12 pr-4 text-base text-white placeholder-gray-500 outline-none transition-colors focus:border-[#64b5f6]/50 focus:bg-[rgba(255,255,255,0.06)]"
+          className="w-full rounded-xl border border-white/5 bg-white/[0.03] py-3 pl-11 pr-4 text-[15px] text-white placeholder-gray-500 outline-none transition-colors focus:border-[#2563eb]/40 focus:bg-white/[0.04]"
           autoFocus
         />
       </div>
 
       {/* Filters */}
-      <div className="mb-6 flex flex-wrap items-center gap-3">
+      <div className="mb-6 flex flex-wrap items-center gap-2.5">
         <input
           type="text"
           value={speakerFilter}
           onChange={(e) => setSpeakerFilter(e.target.value)}
           placeholder="Filter by speaker"
-          className="rounded-lg border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-3 py-1.5 text-sm text-white placeholder-gray-500 outline-none focus:border-[#64b5f6]/50"
+          className="rounded-lg border border-white/5 bg-white/[0.03] px-3 py-1.5 text-[13px] text-white placeholder-gray-500 outline-none focus:border-[#2563eb]/40"
           list="speaker-suggestions"
         />
         <datalist id="speaker-suggestions">
@@ -125,7 +125,7 @@ export default function SearchPage() {
         <select
           value={folderFilter}
           onChange={(e) => setFolderFilter(e.target.value)}
-          className="rounded-lg border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-3 py-1.5 text-sm text-white outline-none focus:border-[#64b5f6]/50"
+          className="rounded-lg border border-white/5 bg-white/[0.03] px-3 py-1.5 text-[13px] text-white outline-none focus:border-[#2563eb]/40"
         >
           <option value="">All folders</option>
           {folders.map((f) => (
@@ -135,20 +135,20 @@ export default function SearchPage() {
           ))}
         </select>
 
-        <div className="flex items-center gap-2 text-sm text-gray-400">
+        <div className="flex items-center gap-2 text-[13px] text-gray-500">
           <span>From</span>
           <input
             type="date"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
-            className="rounded-lg border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-3 py-1.5 text-sm text-white outline-none focus:border-[#64b5f6]/50"
+            className="rounded-lg border border-white/5 bg-white/[0.03] px-3 py-1.5 text-[13px] text-white outline-none focus:border-[#2563eb]/40"
           />
           <span>To</span>
           <input
             type="date"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
-            className="rounded-lg border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-3 py-1.5 text-sm text-white outline-none focus:border-[#64b5f6]/50"
+            className="rounded-lg border border-white/5 bg-white/[0.03] px-3 py-1.5 text-[13px] text-white outline-none focus:border-[#2563eb]/40"
           />
         </div>
       </div>
@@ -158,7 +158,7 @@ export default function SearchPage() {
         <LoadingSpinner message="Building search index..." />
       ) : !query.trim() ? (
         <EmptyState
-          icon={<SearchIcon size={40} className="text-gray-600" />}
+          icon={<SearchIcon size={36} className="text-gray-600" />}
           message="Search across all your meeting transcripts"
         />
       ) : results.length === 0 ? (
@@ -166,30 +166,32 @@ export default function SearchPage() {
           message={`No results found for "${query}"`}
         />
       ) : (
-        <div className="flex flex-col gap-2">
-          <p className="mb-2 text-xs text-gray-500">
+        <div className="flex flex-col">
+          <p className="mb-3 text-[12px] text-gray-500">
             {results.length} result{results.length !== 1 ? "s" : ""}
           </p>
-          {results.map((result) => (
-            <Link
-              key={result.id}
-              href={`/transcript/${result.id}`}
-              className="block rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-4 transition-colors hover:bg-[rgba(255,255,255,0.07)]"
-            >
-              <h3 className="text-sm font-medium text-white">
-                {result.title}
-              </h3>
-              <p className="mt-1 text-sm leading-relaxed text-gray-400">
-                {highlightMatch(result.text, query)}
-              </p>
-              <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
-                <span>{formatDate(result.date)}</span>
-                {result.speakers.length > 0 && (
-                  <span>{result.speakers.join(", ")}</span>
-                )}
-              </div>
-            </Link>
-          ))}
+          <div className="rounded-xl border border-white/5 overflow-hidden">
+            {results.map((result) => (
+              <Link
+                key={result.id}
+                href={`/transcript/${result.id}`}
+                className="block border-b border-white/5 last:border-b-0 px-4 py-3.5 transition-colors hover:bg-white/[0.03]"
+              >
+                <h3 className="text-[15px] font-medium text-white">
+                  {result.title}
+                </h3>
+                <p className="mt-1 text-[13px] leading-relaxed text-gray-400">
+                  {highlightMatch(result.text, query)}
+                </p>
+                <div className="mt-2 flex items-center gap-3 text-[12px] text-gray-500">
+                  <span>{formatDate(result.date)}</span>
+                  {result.speakers.length > 0 && (
+                    <span>{result.speakers.join(", ")}</span>
+                  )}
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
     </div>

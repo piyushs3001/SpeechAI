@@ -88,20 +88,20 @@ export default function SettingsPage() {
   return (
     <div className="mx-auto max-w-2xl">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-semibold text-white">Settings</h1>
+        <h1 className="text-xl font-semibold text-white">Settings</h1>
         <Link
           href="/settings/team"
-          className="inline-flex items-center gap-2 rounded-lg bg-[rgba(255,255,255,0.08)] px-4 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-[rgba(255,255,255,0.12)]"
+          className="inline-flex items-center gap-2 rounded-lg bg-white/[0.06] px-4 py-2 text-[13px] font-medium text-gray-300 transition-colors hover:bg-white/[0.1]"
         >
-          <Users size={16} />
+          <Users size={15} />
           Team
         </Link>
       </div>
 
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-6">
         {/* Whisper Model */}
-        <section className="rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-5">
-          <h2 className="mb-4 text-base font-medium text-white">
+        <section className="rounded-xl border border-white/5 bg-white/[0.02] p-5">
+          <h2 className="mb-4 text-[15px] font-medium text-white">
             Whisper Model
           </h2>
           <select
@@ -109,7 +109,7 @@ export default function SettingsPage() {
             onChange={(e) =>
               setSettings((s) => ({ ...s, whisper_model: e.target.value }))
             }
-            className="w-full rounded-lg border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-3 py-2 text-sm text-white outline-none focus:border-[#64b5f6]/50"
+            className="w-full rounded-lg border border-white/5 bg-white/[0.03] px-3 py-2.5 text-[14px] text-white outline-none focus:border-[#2563eb]/40"
           >
             {WHISPER_MODELS.map((m) => (
               <option key={m.value} value={m.value}>
@@ -117,19 +117,19 @@ export default function SettingsPage() {
               </option>
             ))}
           </select>
-          <p className="mt-2 text-xs text-gray-500">
+          <p className="mt-2.5 text-[12px] text-gray-500">
             Larger models are more accurate but require more RAM and processing time.
           </p>
         </section>
 
         {/* AI Enhancement */}
-        <section className="rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-5">
-          <h2 className="mb-4 text-base font-medium text-white">
+        <section className="rounded-xl border border-white/5 bg-white/[0.02] p-5">
+          <h2 className="mb-4 text-[15px] font-medium text-white">
             AI Enhancement
           </h2>
           <div className="flex flex-col gap-4">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-gray-400">
+              <label className="mb-1.5 block text-[12px] font-medium text-gray-400">
                 OpenAI API Key
               </label>
               <input
@@ -139,11 +139,11 @@ export default function SettingsPage() {
                   setSettings((s) => ({ ...s, openai_api_key: e.target.value }))
                 }
                 placeholder="sk-..."
-                className="w-full rounded-lg border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-3 py-2 text-sm text-white placeholder-gray-500 outline-none focus:border-[#64b5f6]/50"
+                className="w-full rounded-lg border border-white/5 bg-white/[0.03] px-3 py-2.5 text-[14px] text-white placeholder-gray-600 outline-none focus:border-[#2563eb]/40"
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-gray-400">
+              <label className="mb-1.5 block text-[12px] font-medium text-gray-400">
                 Anthropic API Key
               </label>
               <input
@@ -156,32 +156,32 @@ export default function SettingsPage() {
                   }))
                 }
                 placeholder="sk-ant-..."
-                className="w-full rounded-lg border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-3 py-2 text-sm text-white placeholder-gray-500 outline-none focus:border-[#64b5f6]/50"
+                className="w-full rounded-lg border border-white/5 bg-white/[0.03] px-3 py-2.5 text-[14px] text-white placeholder-gray-600 outline-none focus:border-[#2563eb]/40"
               />
             </div>
           </div>
-          <p className="mt-3 text-xs text-gray-500">
+          <p className="mt-3 text-[12px] text-gray-500">
             API keys are used for AI-powered summaries and action item extraction.
           </p>
         </section>
 
         {/* Google Drive */}
-        <section className="rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-5">
-          <h2 className="mb-4 text-base font-medium text-white">
+        <section className="rounded-xl border border-white/5 bg-white/[0.02] p-5">
+          <h2 className="mb-4 text-[15px] font-medium text-white">
             Google Drive
           </h2>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-gray-400">
+            <label className="mb-1.5 block text-[12px] font-medium text-gray-400">
               Folder ID
             </label>
             <input
               type="text"
               value={settings.google_drive_folder_id}
               readOnly
-              className="w-full rounded-lg border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] px-3 py-2 text-sm text-gray-400 outline-none cursor-default"
+              className="w-full rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2.5 text-[14px] text-gray-500 outline-none cursor-default"
             />
           </div>
-          <p className="mt-2 text-xs text-gray-500">
+          <p className="mt-2.5 text-[12px] text-gray-500">
             This is the Google Drive folder where audio files and transcripts are stored.
           </p>
         </section>
@@ -191,9 +191,9 @@ export default function SettingsPage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#64b5f6] px-5 py-2.5 text-sm font-medium text-[#0f0f1a] transition-colors hover:bg-[#64b5f6]/80 disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-lg bg-[#2563eb] px-5 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#2563eb]/80 disabled:opacity-50"
           >
-            <Save size={16} />
+            <Save size={15} />
             {saving ? "Saving..." : "Save Settings"}
           </button>
         </div>

@@ -25,17 +25,17 @@ export default function DashboardPage() {
     <div className="mx-auto max-w-4xl">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-semibold text-white">My Meetings</h1>
-        <div className="flex items-center gap-3">
+        <h1 className="text-xl font-semibold text-white">My Meetings</h1>
+        <div className="flex items-center gap-2.5">
           <Link
             href="/recorder"
-            className="inline-flex items-center gap-2 rounded-lg bg-[#64b5f6] px-4 py-2 text-sm font-medium text-[#0f0f1a] transition-colors hover:bg-[#64b5f6]/80"
+            className="inline-flex items-center gap-2 rounded-lg bg-[#2563eb] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#2563eb]/80"
           >
             New Recording
           </Link>
           <Link
             href="/upload"
-            className="inline-flex items-center gap-2 rounded-lg bg-[rgba(255,255,255,0.08)] px-4 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-[rgba(255,255,255,0.12)]"
+            className="inline-flex items-center gap-2 rounded-lg bg-white/[0.06] px-4 py-2 text-[13px] font-medium text-gray-300 transition-colors hover:bg-white/[0.1]"
           >
             Upload
           </Link>
@@ -49,20 +49,20 @@ export default function DashboardPage() {
         <ErrorState message={error} onRetry={fetchMeetings} />
       ) : meetings.length === 0 ? (
         <EmptyState
-          icon={<Mic size={40} className="text-gray-600" />}
+          icon={<Mic size={36} className="text-gray-600" />}
           message="No meetings yet"
           description="Upload a recording or start a new one."
           action={
-            <div className="flex items-center justify-center gap-3">
+            <div className="flex items-center justify-center gap-2.5">
               <Link
                 href="/recorder"
-                className="inline-flex items-center gap-2 rounded-lg bg-[#64b5f6] px-4 py-2 text-sm font-medium text-[#0f0f1a] transition-colors hover:bg-[#64b5f6]/80"
+                className="inline-flex items-center gap-2 rounded-lg bg-[#2563eb] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#2563eb]/80"
               >
                 New Recording
               </Link>
               <Link
                 href="/upload"
-                className="inline-flex items-center gap-2 rounded-lg bg-[rgba(255,255,255,0.08)] px-4 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-[rgba(255,255,255,0.12)]"
+                className="inline-flex items-center gap-2 rounded-lg bg-white/[0.06] px-4 py-2 text-[13px] font-medium text-gray-300 transition-colors hover:bg-white/[0.1]"
               >
                 Upload
               </Link>
@@ -70,7 +70,7 @@ export default function DashboardPage() {
           }
         />
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="rounded-xl border border-white/5 overflow-hidden">
           {meetings.map((meeting) => (
             <MeetingCard key={meeting.id} meeting={meeting} />
           ))}
