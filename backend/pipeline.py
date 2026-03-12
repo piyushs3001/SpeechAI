@@ -48,7 +48,7 @@ async def process_job(job: Job):
     wav_path = None
 
     try:
-        drive = DriveClient(job.access_token)
+        drive = DriveClient(job.access_token, getattr(job, 'refresh_token', ''))
 
         # Determine the Drive subfolder for this meeting.
         # Unfoldered meetings go under meetings/{meeting_id}/

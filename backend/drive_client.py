@@ -1,25 +1,37 @@
 import json
 
 from google.oauth2.credentials import Credentials
+from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaInMemoryUpload, MediaIoBaseDownload
 
-from config import GOOGLE_DRIVE_FOLDER_ID
+from config import GOOGLE_DRIVE_FOLDER_ID, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 
 SCOPES = ["https://www.googleapis.com/auth/drive.file"]
+TOKEN_URI = "https://oauth2.googleapis.com/token"
 
 
-def get_drive_service(access_token: str):
-    """Build a Drive service using the user's OAuth access token."""
-    creds = Credentials(token=access_token)
+def get_drive_service(access_token: str, refresh_token: str = ""):
+    """Build a Drive service using the user's OAuth credentials with refresh support."""
+    creds = Credentials(
+        token=access_token,
+        refresh_token=refresh_token or None,
+        token_uri=TOKEN_URI,
+        client_id=GOOGLE_CLIENT_ID,
+        client_secret=GOOGLE_CLIENT_SECRET,
+        scopes=SCOPES,
+    )
+    # Refresh if expired
+    if creds.expired or not creds.valid:
+        creds.refresh(Request())
     return build("drive", "v3", credentials=creds)
 
 
 class DriveClient:
-    """Drive client that uses the user's OAuth access token."""
+    """Drive client that uses the user's OAuth access token with auto-refresh."""
 
-    def __init__(self, access_token: str):
-        self.service = get_drive_service(access_token)
+    def __init__(self, access_token: str, refresh_token: str = ""):
+        self.service = get_drive_service(access_token, refresh_token)
         self.root_folder_id = GOOGLE_DRIVE_FOLDER_ID
         self._folder_cache: dict[str, str] = {}
 

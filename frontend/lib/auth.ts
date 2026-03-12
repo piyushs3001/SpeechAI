@@ -75,6 +75,8 @@ export const authOptions: NextAuthOptions = {
       }
       (session as Record<string, unknown>).accessToken =
         token.accessToken as string;
+      (session as Record<string, unknown>).refreshToken =
+        token.refreshToken as string;
       (session as Record<string, unknown>).error = token.error as
         | string
         | undefined;

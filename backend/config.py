@@ -11,6 +11,8 @@ _sa_path = os.getenv("GOOGLE_SERVICE_ACCOUNT_KEY_PATH", _default_sa_path)
 # Resolve relative paths against project root
 GOOGLE_SERVICE_ACCOUNT_KEY_PATH = str((_project_root / _sa_path).resolve()) if not os.path.isabs(_sa_path) else _sa_path
 GOOGLE_DRIVE_FOLDER_ID = os.getenv("GOOGLE_DRIVE_FOLDER_ID", "")
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")
 HF_AUTH_TOKEN = os.getenv("HF_AUTH_TOKEN", "")
 WHISPER_MODEL = os.getenv("WHISPER_MODEL", "base")
 FASTAPI_PORT = int(os.getenv("FASTAPI_PORT", "8000"))

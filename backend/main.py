@@ -61,7 +61,8 @@ async def upload_file(request: Request, file: UploadFile = File(...)):
             f.write(chunk)
 
     access_token = _get_token(request)
-    job = Job(id=job_id, meeting_id=meeting_id, access_token=access_token)
+    refresh_token = _get_refresh_token(request)
+    job = Job(id=job_id, meeting_id=meeting_id, access_token=access_token, refresh_token=refresh_token)
     job_queue.add_job(job)
 
     return {
@@ -128,15 +129,18 @@ def _get_token(request: Request) -> str:
     if not auth.startswith("Bearer "):
         logger.error("No Authorization header found in request")
         raise HTTPException(status_code=401, detail="Missing access token")
-    token = auth[7:]
-    logger.info(f"Got access token: {token[:20]}...")
-    return token
+    return auth[7:]
+
+
+def _get_refresh_token(request: Request) -> str:
+    """Extract refresh token from X-Refresh-Token header."""
+    return request.headers.get("X-Refresh-Token", "")
 
 
 def _get_drive(request: Request):
-    """Create a DriveClient using the user's OAuth access token."""
+    """Create a DriveClient using the user's OAuth tokens with refresh support."""
     from drive_client import DriveClient
-    return DriveClient(_get_token(request))
+    return DriveClient(_get_token(request), _get_refresh_token(request))
 
 
 def _find_meeting_json(drive, meeting_id: str) -> tuple[str | None, str | None]:

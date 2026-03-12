@@ -3,25 +3,31 @@ import { authOptions } from "./auth";
 
 const BACKEND_URL = process.env.FASTAPI_URL || "http://localhost:8000";
 
-export async function getAccessToken(): Promise<string | undefined> {
+export async function getTokens(): Promise<{
+  accessToken?: string;
+  refreshToken?: string;
+}> {
   const session = await getServerSession(authOptions);
-  const token = (session as Record<string, unknown>)?.accessToken as
-    | string
-    | undefined;
-  if (!token) {
-    console.error(
-      "[api] No accessToken in session. Session keys:",
-      session ? Object.keys(session) : "no session"
-    );
-  }
-  return token;
+  const s = session as Record<string, unknown> | null;
+  return {
+    accessToken: s?.accessToken as string | undefined,
+    refreshToken: s?.refreshToken as string | undefined,
+  };
+}
+
+export async function getAccessToken(): Promise<string | undefined> {
+  const { accessToken } = await getTokens();
+  return accessToken;
 }
 
 export async function backendFetch(path: string, init?: RequestInit) {
-  const accessToken = await getAccessToken();
+  const { accessToken, refreshToken } = await getTokens();
   const headers = new Headers(init?.headers);
   if (accessToken) {
     headers.set("Authorization", `Bearer ${accessToken}`);
+  }
+  if (refreshToken) {
+    headers.set("X-Refresh-Token", refreshToken);
   }
   const res = await fetch(`${BACKEND_URL}${path}`, { ...init, headers });
   if (!res.ok) {
