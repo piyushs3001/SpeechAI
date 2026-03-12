@@ -18,13 +18,13 @@ export function ErrorState({
       <div className="text-center">
         <AlertCircle
           size={36}
-          className="mx-auto mb-3 text-red-400/60"
+          className="mx-auto mb-3 text-red-400"
         />
-        <p className="text-[14px] text-gray-400">{message}</p>
+        <p className="text-[14px] text-[#6b7280]">{message}</p>
         {onRetry && (
           <button
             onClick={onRetry}
-            className="mt-5 inline-flex items-center gap-2 rounded-lg bg-white/[0.06] px-4 py-2 text-[13px] font-medium text-gray-300 transition-colors hover:bg-white/[0.1]"
+            className="mt-5 inline-flex items-center gap-2 rounded-lg border border-[#e5e7eb] bg-white px-4 py-2 text-[13px] font-medium text-[#374151] transition-colors hover:bg-[#f3f4f6]"
           >
             Try again
           </button>

@@ -19,8 +19,8 @@ export function SidebarNavItem({ href, icon, label }: SidebarNavItemProps) {
       href={href}
       className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium transition-colors ${
         isActive
-          ? "bg-[#2563eb]/10 text-[#2563eb]"
-          : "text-gray-400 hover:bg-white/[0.04] hover:text-gray-200"
+          ? "bg-white/10 text-white"
+          : "text-gray-400 hover:bg-white/[0.06] hover:text-gray-200"
       }`}
     >
       <span className="flex h-5 w-5 shrink-0 items-center justify-center">

@@ -79,6 +79,7 @@ export default function TranscriptViewerPage() {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [exportOpen, setExportOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"transcript" | "summary">("transcript");
   const [summaryData, setSummaryData] = useState<{
     summary: string;
     action_items: { text: string; assignee: string }[];
@@ -213,20 +214,20 @@ export default function TranscriptViewerPage() {
         <div className="mb-5 shrink-0">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <h1 className="text-lg font-semibold text-white truncate">
+              <h1 className="text-lg font-semibold text-[#111827] truncate">
                 {meeting.title}
               </h1>
-              <p className="mt-1 text-[13px] text-gray-500">
+              <p className="mt-1 text-[13px] text-[#6b7280]">
                 {formatDate(meeting.date)}
                 {meeting.duration > 0 && (
                   <>
-                    <span className="mx-1.5 text-gray-600">·</span>
+                    <span className="mx-1.5 text-[#d1d5db]">·</span>
                     {formatDuration(meeting.duration)}
                   </>
                 )}
                 {speakers.length > 0 && (
                   <>
-                    <span className="mx-1.5 text-gray-600">·</span>
+                    <span className="mx-1.5 text-[#d1d5db]">·</span>
                     {speakers.length} speaker{speakers.length !== 1 ? "s" : ""}
                   </>
                 )}
@@ -236,7 +237,7 @@ export default function TranscriptViewerPage() {
             <div className="flex items-center gap-2 shrink-0">
               <Link
                 href={`/transcript/${id}/edit`}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-white/[0.06] px-3 py-1.5 text-[13px] font-medium text-gray-300 transition-colors hover:bg-white/[0.1]"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[#e5e7eb] bg-white px-3 py-1.5 text-[13px] font-medium text-[#374151] transition-colors hover:bg-[#f3f4f6]"
               >
                 <svg
                   width="14"
@@ -258,7 +259,7 @@ export default function TranscriptViewerPage() {
               <div className="relative">
                 <button
                   onClick={() => setExportOpen(!exportOpen)}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-white/[0.06] px-3 py-1.5 text-[13px] font-medium text-gray-300 transition-colors hover:bg-white/[0.1]"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-[#e5e7eb] bg-white px-3 py-1.5 text-[13px] font-medium text-[#374151] transition-colors hover:bg-[#f3f4f6]"
                 >
                   <svg
                     width="14"
@@ -287,7 +288,7 @@ export default function TranscriptViewerPage() {
                   </svg>
                 </button>
                 {exportOpen && (
-                  <div className="absolute right-0 top-full mt-1 z-10 w-36 rounded-lg border border-white/5 bg-[#1a1a2e] py-1 shadow-xl">
+                  <div className="absolute right-0 top-full mt-1 z-10 w-36 rounded-lg border border-[#e5e7eb] bg-white py-1 shadow-lg">
                     <button
                       onClick={() => {
                         const speakerMap = Object.fromEntries(speakers.map((s) => [s, s]));
@@ -295,7 +296,7 @@ export default function TranscriptViewerPage() {
                         downloadFile(txt, `${meeting.title || "transcript"}.txt`, "text/plain");
                         setExportOpen(false);
                       }}
-                      className="block w-full px-3 py-2 text-left text-[13px] text-gray-300 hover:bg-white/[0.06] transition-colors"
+                      className="block w-full px-3 py-2 text-left text-[13px] text-[#374151] hover:bg-[#f3f4f6] transition-colors"
                     >
                       Export as TXT
                     </button>
@@ -306,7 +307,7 @@ export default function TranscriptViewerPage() {
                         downloadFile(srt, `${meeting.title || "transcript"}.srt`, "text/srt");
                         setExportOpen(false);
                       }}
-                      className="block w-full px-3 py-2 text-left text-[13px] text-gray-300 hover:bg-white/[0.06] transition-colors"
+                      className="block w-full px-3 py-2 text-left text-[13px] text-[#374151] hover:bg-[#f3f4f6] transition-colors"
                     >
                       Export as SRT
                     </button>
@@ -319,7 +320,7 @@ export default function TranscriptViewerPage() {
                         );
                         setExportOpen(false);
                       }}
-                      className="block w-full px-3 py-2 text-left text-[13px] text-gray-300 hover:bg-white/[0.06] transition-colors"
+                      className="block w-full px-3 py-2 text-left text-[13px] text-[#374151] hover:bg-[#f3f4f6] transition-colors"
                     >
                       Export as PDF
                     </button>
@@ -330,6 +331,30 @@ export default function TranscriptViewerPage() {
           </div>
         </div>
 
+        {/* Tab bar - visible on mobile, hidden on lg+ where we show side by side */}
+        <div className="flex border-b border-[#e5e7eb] mb-4 shrink-0 lg:hidden">
+          <button
+            onClick={() => setActiveTab("transcript")}
+            className={`px-4 py-2.5 text-[13px] font-medium transition-colors border-b-2 -mb-px ${
+              activeTab === "transcript"
+                ? "border-[#2563eb] text-[#2563eb]"
+                : "border-transparent text-[#6b7280] hover:text-[#374151]"
+            }`}
+          >
+            Transcript
+          </button>
+          <button
+            onClick={() => setActiveTab("summary")}
+            className={`px-4 py-2.5 text-[13px] font-medium transition-colors border-b-2 -mb-px ${
+              activeTab === "summary"
+                ? "border-[#2563eb] text-[#2563eb]"
+                : "border-transparent text-[#6b7280] hover:text-[#374151]"
+            }`}
+          >
+            Summary
+          </button>
+        </div>
+
         {/* Audio player */}
         {audioUrl && (
           <div className="mb-4 shrink-0">
@@ -337,15 +362,44 @@ export default function TranscriptViewerPage() {
           </div>
         )}
 
-        {/* Transcript segments */}
-        <div className="flex-1 overflow-y-auto -mr-2 pr-2">
+        {/* Mobile: tab content */}
+        <div className="flex-1 overflow-y-auto -mr-2 pr-2 lg:hidden">
+          {activeTab === "transcript" ? (
+            segments.length === 0 ? (
+              <EmptyState
+                message="No transcript segments available."
+                className="py-10"
+              />
+            ) : (
+              <div className="flex flex-col">
+                {segments.map((seg, i) => (
+                  <TranscriptSegment
+                    key={i}
+                    segment={seg}
+                    speakerName={seg.speaker}
+                    speakerColor={getSpeakerColor(seg.speaker, speakers)}
+                    isActive={i === activeSegmentIndex}
+                    onClick={() => handleSeek(seg.start)}
+                  />
+                ))}
+              </div>
+            )
+          ) : (
+            <div className="rounded-xl border border-[#e5e7eb] bg-white p-5">
+              <SummaryPanel meetingId={id} />
+            </div>
+          )}
+        </div>
+
+        {/* Desktop: transcript segments only */}
+        <div className="hidden lg:flex flex-1 overflow-y-auto -mr-2 pr-2">
           {segments.length === 0 ? (
             <EmptyState
               message="No transcript segments available."
               className="py-10"
             />
           ) : (
-            <div className="flex flex-col">
+            <div className="flex flex-col w-full">
               {segments.map((seg, i) => (
                 <TranscriptSegment
                   key={i}
@@ -361,8 +415,8 @@ export default function TranscriptViewerPage() {
         </div>
       </div>
 
-      {/* Right panel */}
-      <aside className="w-80 shrink-0 overflow-y-auto rounded-xl border border-white/5 bg-white/[0.02] p-5">
+      {/* Right panel - visible on lg+ */}
+      <aside className="hidden lg:block w-80 shrink-0 overflow-y-auto rounded-xl border border-[#e5e7eb] bg-white p-5 shadow-sm">
         <SummaryPanel meetingId={id} />
       </aside>
     </div>

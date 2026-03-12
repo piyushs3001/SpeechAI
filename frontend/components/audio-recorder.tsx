@@ -68,7 +68,7 @@ function WaveformVisualizer({ analyserNode }: { analyserNode: AnalyserNode | nul
         {Array.from({ length: 40 }).map((_, i) => (
           <div
             key={i}
-            className="w-1.5 rounded-sm bg-white/[0.06]"
+            className="w-1.5 rounded-sm bg-[#e5e7eb]"
             style={{ height: 4 }}
           />
         ))}
@@ -124,16 +124,16 @@ export function AudioRecorder({ onRecordingComplete }: AudioRecorderProps) {
         {isRecording && (
           <>
             <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-            <span className="text-[13px] text-red-400">Recording...</span>
+            <span className="text-[13px] text-red-500">Recording...</span>
           </>
         )}
         {isPaused && (
-          <span className="text-[13px] text-yellow-400">Paused</span>
+          <span className="text-[13px] text-yellow-600">Paused</span>
         )}
       </div>
 
       {/* Timer */}
-      <div className="font-mono text-5xl text-white tabular-nums tracking-tight">
+      <div className="font-mono text-5xl text-[#111827] tabular-nums tracking-tight">
         {formatTime(duration)}
       </div>
 
@@ -148,7 +148,7 @@ export function AudioRecorder({ onRecordingComplete }: AudioRecorderProps) {
         {!isActive ? (
           <button
             onClick={handleRecord}
-            className="flex h-16 w-16 items-center justify-center rounded-full bg-[#2563eb] transition-colors hover:bg-[#2563eb]/80"
+            className="flex h-16 w-16 items-center justify-center rounded-full bg-[#2563eb] transition-colors hover:bg-[#1d4ed8]"
             aria-label="Start recording"
           >
             <span className="h-5 w-5 rounded-full bg-white" />
@@ -158,15 +158,15 @@ export function AudioRecorder({ onRecordingComplete }: AudioRecorderProps) {
             {/* Pause / Resume */}
             <button
               onClick={isPaused ? resume : pause}
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-white/[0.06] transition-colors hover:bg-white/[0.1]"
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-[#e5e7eb] bg-white transition-colors hover:bg-[#f3f4f6]"
               aria-label={isPaused ? "Resume" : "Pause"}
             >
               {isPaused ? (
-                <svg width="16" height="18" viewBox="0 0 16 18" fill="white">
+                <svg width="16" height="18" viewBox="0 0 16 18" fill="#374151">
                   <path d="M0 0L16 9L0 18Z" />
                 </svg>
               ) : (
-                <svg width="14" height="18" viewBox="0 0 14 18" fill="white">
+                <svg width="14" height="18" viewBox="0 0 14 18" fill="#374151">
                   <rect x="0" y="0" width="4" height="18" rx="1" />
                   <rect x="10" y="0" width="4" height="18" rx="1" />
                 </svg>
@@ -187,7 +187,7 @@ export function AudioRecorder({ onRecordingComplete }: AudioRecorderProps) {
 
       {/* Error */}
       {error && (
-        <p className="text-[13px] text-red-400">{error}</p>
+        <p className="text-[13px] text-red-500">{error}</p>
       )}
     </div>
   );

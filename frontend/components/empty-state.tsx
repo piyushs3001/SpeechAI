@@ -21,9 +21,9 @@ export function EmptyState({
     <div className={`flex items-center justify-center py-20 ${className}`}>
       <div className="text-center">
         {icon && <div className="mb-4 flex justify-center">{icon}</div>}
-        <p className="text-[14px] font-medium text-gray-400">{message}</p>
+        <p className="text-[14px] font-medium text-[#6b7280]">{message}</p>
         {description && (
-          <p className="mt-1.5 text-[13px] text-gray-500">{description}</p>
+          <p className="mt-1.5 text-[13px] text-[#9ca3af]">{description}</p>
         )}
         {action && <div className="mt-5">{action}</div>}
       </div>

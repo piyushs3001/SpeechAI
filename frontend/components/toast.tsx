@@ -88,29 +88,29 @@ function ToastItem({
   }, []);
 
   const iconMap: Record<ToastType, ReactNode> = {
-    success: <CheckCircle size={16} className="text-green-400 shrink-0" />,
-    error: <XCircle size={16} className="text-red-400 shrink-0" />,
-    info: <Info size={16} className="text-[#64b5f6] shrink-0" />,
+    success: <CheckCircle size={16} className="text-green-500 shrink-0" />,
+    error: <XCircle size={16} className="text-red-500 shrink-0" />,
+    info: <Info size={16} className="text-[#2563eb] shrink-0" />,
   };
 
   const borderMap: Record<ToastType, string> = {
-    success: "border-green-500/30",
-    error: "border-red-500/30",
-    info: "border-[#64b5f6]/30",
+    success: "border-green-200",
+    error: "border-red-200",
+    info: "border-blue-200",
   };
 
   return (
     <div
-      className={`pointer-events-auto flex items-center gap-3 rounded-xl border bg-[#1a1a2e] px-4 py-3 shadow-xl transition-all duration-300 ${
+      className={`pointer-events-auto flex items-center gap-3 rounded-xl border bg-white px-4 py-3 shadow-lg transition-all duration-300 ${
         borderMap[toast.type]
       } ${visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
       style={{ minWidth: 260, maxWidth: 380 }}
     >
       {iconMap[toast.type]}
-      <p className="flex-1 text-sm text-gray-200">{toast.message}</p>
+      <p className="flex-1 text-sm text-[#374151]">{toast.message}</p>
       <button
         onClick={() => onDismiss(toast.id)}
-        className="shrink-0 rounded p-0.5 text-gray-500 transition-colors hover:text-gray-300"
+        className="shrink-0 rounded p-0.5 text-[#9ca3af] transition-colors hover:text-[#374151]"
         aria-label="Dismiss"
       >
         <X size={14} />

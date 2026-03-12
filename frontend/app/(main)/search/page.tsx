@@ -94,14 +94,14 @@ export default function SearchPage() {
       <div className="relative mb-6">
         <SearchIcon
           size={18}
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9ca3af]"
         />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search across all your meeting transcripts..."
-          className="w-full rounded-xl border border-white/5 bg-white/[0.03] py-3 pl-11 pr-4 text-[15px] text-white placeholder-gray-500 outline-none transition-colors focus:border-[#2563eb]/40 focus:bg-white/[0.04]"
+          className="w-full rounded-xl border border-[#e5e7eb] bg-white py-3 pl-11 pr-4 text-[15px] text-[#111827] placeholder-[#9ca3af] outline-none transition-colors focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb]"
           autoFocus
         />
       </div>
@@ -113,7 +113,7 @@ export default function SearchPage() {
           value={speakerFilter}
           onChange={(e) => setSpeakerFilter(e.target.value)}
           placeholder="Filter by speaker"
-          className="rounded-lg border border-white/5 bg-white/[0.03] px-3 py-1.5 text-[13px] text-white placeholder-gray-500 outline-none focus:border-[#2563eb]/40"
+          className="rounded-lg border border-[#e5e7eb] bg-white px-3 py-1.5 text-[13px] text-[#111827] placeholder-[#9ca3af] outline-none focus:border-[#2563eb]"
           list="speaker-suggestions"
         />
         <datalist id="speaker-suggestions">
@@ -125,7 +125,7 @@ export default function SearchPage() {
         <select
           value={folderFilter}
           onChange={(e) => setFolderFilter(e.target.value)}
-          className="rounded-lg border border-white/5 bg-white/[0.03] px-3 py-1.5 text-[13px] text-white outline-none focus:border-[#2563eb]/40"
+          className="rounded-lg border border-[#e5e7eb] bg-white px-3 py-1.5 text-[13px] text-[#111827] outline-none focus:border-[#2563eb]"
         >
           <option value="">All folders</option>
           {folders.map((f) => (
@@ -135,20 +135,20 @@ export default function SearchPage() {
           ))}
         </select>
 
-        <div className="flex items-center gap-2 text-[13px] text-gray-500">
+        <div className="flex items-center gap-2 text-[13px] text-[#6b7280]">
           <span>From</span>
           <input
             type="date"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
-            className="rounded-lg border border-white/5 bg-white/[0.03] px-3 py-1.5 text-[13px] text-white outline-none focus:border-[#2563eb]/40"
+            className="rounded-lg border border-[#e5e7eb] bg-white px-3 py-1.5 text-[13px] text-[#111827] outline-none focus:border-[#2563eb]"
           />
           <span>To</span>
           <input
             type="date"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
-            className="rounded-lg border border-white/5 bg-white/[0.03] px-3 py-1.5 text-[13px] text-white outline-none focus:border-[#2563eb]/40"
+            className="rounded-lg border border-[#e5e7eb] bg-white px-3 py-1.5 text-[13px] text-[#111827] outline-none focus:border-[#2563eb]"
           />
         </div>
       </div>
@@ -158,7 +158,7 @@ export default function SearchPage() {
         <LoadingSpinner message="Building search index..." />
       ) : !query.trim() ? (
         <EmptyState
-          icon={<SearchIcon size={36} className="text-gray-600" />}
+          icon={<SearchIcon size={36} className="text-[#9ca3af]" />}
           message="Search across all your meeting transcripts"
         />
       ) : results.length === 0 ? (
@@ -167,23 +167,23 @@ export default function SearchPage() {
         />
       ) : (
         <div className="flex flex-col">
-          <p className="mb-3 text-[12px] text-gray-500">
+          <p className="mb-3 text-[12px] text-[#6b7280]">
             {results.length} result{results.length !== 1 ? "s" : ""}
           </p>
-          <div className="rounded-xl border border-white/5 overflow-hidden">
+          <div className="rounded-xl border border-[#e5e7eb] bg-white overflow-hidden shadow-sm">
             {results.map((result) => (
               <Link
                 key={result.id}
                 href={`/transcript/${result.id}`}
-                className="block border-b border-white/5 last:border-b-0 px-4 py-3.5 transition-colors hover:bg-white/[0.03]"
+                className="block border-b border-[#e5e7eb] last:border-b-0 px-4 py-3.5 transition-colors hover:bg-[#f3f4f6]"
               >
-                <h3 className="text-[15px] font-medium text-white">
+                <h3 className="text-[15px] font-medium text-[#111827]">
                   {result.title}
                 </h3>
-                <p className="mt-1 text-[13px] leading-relaxed text-gray-400">
+                <p className="mt-1 text-[13px] leading-relaxed text-[#6b7280]">
                   {highlightMatch(result.text, query)}
                 </p>
-                <div className="mt-2 flex items-center gap-3 text-[12px] text-gray-500">
+                <div className="mt-2 flex items-center gap-3 text-[12px] text-[#9ca3af]">
                   <span>{formatDate(result.date)}</span>
                   {result.speakers.length > 0 && (
                     <span>{result.speakers.join(", ")}</span>

@@ -49,21 +49,21 @@ function formatDate(dateStr: string): string {
 function StatusBadge({ meeting }: { meeting: Meeting }) {
   if (meeting.status === "failed") {
     return (
-      <span className="inline-flex items-center rounded-full bg-red-500/10 px-2 py-0.5 text-[11px] font-medium text-red-400">
+      <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-medium text-red-600">
         Failed
       </span>
     );
   }
   if (meeting.has_summary) {
     return (
-      <span className="inline-flex items-center rounded-full bg-[#2563eb]/10 px-2 py-0.5 text-[11px] font-medium text-[#2563eb]">
+      <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-[#2563eb]">
         Summary Ready
       </span>
     );
   }
   if (meeting.action_item_count > 0) {
     return (
-      <span className="inline-flex items-center rounded-full bg-orange-500/10 px-2 py-0.5 text-[11px] font-medium text-orange-400">
+      <span className="inline-flex items-center rounded-full bg-orange-50 px-2 py-0.5 text-[11px] font-medium text-orange-600">
         {meeting.action_item_count} Action Item{meeting.action_item_count !== 1 ? "s" : ""}
       </span>
     );
@@ -93,29 +93,29 @@ export function MeetingCard({ meeting }: MeetingCardProps) {
     : undefined;
 
   const content = (
-    <div className="border-b border-white/5 px-4 py-3.5 transition-colors hover:bg-white/[0.03]">
+    <div className="border-b border-[#e5e7eb] last:border-b-0 px-4 py-3.5 transition-colors hover:bg-[#f3f4f6]">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/[0.04]">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#f3f4f6]">
             {meeting.status === "failed" ? (
-              <FileText size={16} className="text-gray-500" />
+              <FileText size={16} className="text-[#9ca3af]" />
             ) : (
               <Mic size={16} className="text-[#2563eb]" />
             )}
           </div>
           <div className="min-w-0">
-            <h3 className="text-[15px] font-medium text-white truncate">
+            <h3 className="text-[15px] font-medium text-[#111827] truncate">
               {meeting.title}
             </h3>
-            <p className="mt-0.5 text-[13px] text-gray-500">
+            <p className="mt-0.5 text-[13px] text-[#6b7280]">
               {formatDate(meeting.date)}
               {meeting.duration > 0 && (
-                <span className="mx-1.5 text-gray-600">·</span>
+                <span className="mx-1.5 text-[#d1d5db]">·</span>
               )}
               {meeting.duration > 0 && formatDuration(meeting.duration)}
               {meeting.speakers.length > 0 && (
                 <>
-                  <span className="mx-1.5 text-gray-600">·</span>
+                  <span className="mx-1.5 text-[#d1d5db]">·</span>
                   {meeting.speakers.length} speaker{meeting.speakers.length !== 1 ? "s" : ""}
                 </>
               )}
@@ -139,7 +139,7 @@ export function MeetingCard({ meeting }: MeetingCardProps) {
             // Retry logic would go here
             window.location.href = "/upload";
           }}
-          className="absolute right-4 bottom-3 text-[11px] text-red-400 hover:text-red-300 font-medium"
+          className="absolute right-4 bottom-3 text-[11px] text-red-500 hover:text-red-700 font-medium"
         >
           Retry
         </button>

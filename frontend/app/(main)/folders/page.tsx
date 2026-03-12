@@ -71,10 +71,10 @@ export default function FoldersPage() {
     <div className="mx-auto max-w-4xl">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-semibold text-white">Folders</h1>
+        <h1 className="text-2xl font-semibold text-[#111827]">Folders</h1>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="inline-flex items-center gap-2 rounded-lg bg-[#64b5f6] px-4 py-2 text-sm font-medium text-[#0f0f1a] transition-colors hover:bg-[#64b5f6]/80"
+          className="inline-flex items-center gap-2 rounded-lg bg-[#2563eb] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#1d4ed8]"
         >
           <Plus size={16} />
           New Folder
@@ -83,10 +83,10 @@ export default function FoldersPage() {
 
       {/* Create folder form */}
       {showForm && (
-        <div className="mb-6 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-4">
+        <div className="mb-6 rounded-xl border border-[#e5e7eb] bg-white p-4 shadow-sm">
           <div className="flex items-end gap-3">
             <div className="flex-1">
-              <label className="mb-1.5 block text-xs font-medium text-gray-400">
+              <label className="mb-1.5 block text-xs font-medium text-[#6b7280]">
                 Folder name
               </label>
               <input
@@ -94,13 +94,13 @@ export default function FoldersPage() {
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="e.g. Project Alpha"
-                className="w-full rounded-lg border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-3 py-2 text-sm text-white placeholder-gray-500 outline-none focus:border-[#64b5f6]/50"
+                className="w-full rounded-lg border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#111827] placeholder-[#9ca3af] outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb]"
                 onKeyDown={(e) => e.key === "Enter" && handleCreate()}
                 autoFocus
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-gray-400">
+              <label className="mb-1.5 block text-xs font-medium text-[#6b7280]">
                 Color
               </label>
               <div className="flex items-center gap-1.5">
@@ -124,7 +124,7 @@ export default function FoldersPage() {
             <button
               onClick={handleCreate}
               disabled={!newName.trim() || creating}
-              className="rounded-lg bg-[#64b5f6] px-4 py-2 text-sm font-medium text-[#0f0f1a] transition-colors hover:bg-[#64b5f6]/80 disabled:opacity-50"
+              className="rounded-lg bg-[#2563eb] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#1d4ed8] disabled:opacity-50"
             >
               {creating ? "Creating..." : "Create"}
             </button>
@@ -137,13 +137,13 @@ export default function FoldersPage() {
         <LoadingSpinner message="Loading folders..." />
       ) : folders.length === 0 ? (
         <EmptyState
-          icon={<FolderOpen size={40} className="text-gray-600" />}
+          icon={<FolderOpen size={40} className="text-[#9ca3af]" />}
           message="No folders yet"
           description="Create one to organize your meetings."
           action={
             <button
               onClick={() => setShowForm(true)}
-              className="inline-flex items-center gap-2 rounded-lg bg-[#64b5f6] px-4 py-2 text-sm font-medium text-[#0f0f1a] transition-colors hover:bg-[#64b5f6]/80"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#2563eb] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#1d4ed8]"
             >
               <Plus size={16} />
               New Folder
@@ -157,7 +157,7 @@ export default function FoldersPage() {
             return (
               <div
                 key={folder.id}
-                className="flex items-center justify-between rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-4 transition-colors hover:bg-[rgba(255,255,255,0.07)]"
+                className="flex items-center justify-between rounded-xl border border-[#e5e7eb] bg-white p-4 transition-colors hover:bg-[#f3f4f6] shadow-sm"
               >
                 <Link
                   href={`/folders/${folder.id}`}
@@ -167,16 +167,16 @@ export default function FoldersPage() {
                     className="h-3 w-3 shrink-0 rounded-full"
                     style={{ backgroundColor: folder.color }}
                   />
-                  <span className="text-sm font-medium text-white truncate">
+                  <span className="text-sm font-medium text-[#111827] truncate">
                     {folder.name}
                   </span>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-[#6b7280]">
                     {count} meeting{count !== 1 ? "s" : ""}
                   </span>
                 </Link>
                 <button
                   onClick={() => handleDelete(folder.id, folder.name)}
-                  className="shrink-0 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-[rgba(255,255,255,0.08)] hover:text-red-400"
+                  className="shrink-0 rounded-lg p-1.5 text-[#9ca3af] transition-colors hover:bg-[#f3f4f6] hover:text-red-500"
                 >
                   <Trash2 size={14} />
                 </button>

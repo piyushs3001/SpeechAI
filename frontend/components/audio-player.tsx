@@ -78,14 +78,14 @@ export function AudioPlayer({ audioUrl, onTimeUpdate }: AudioPlayerProps) {
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="rounded-lg bg-white/[0.03] border border-white/5 px-4 py-3">
+    <div className="rounded-lg bg-white border border-[#e5e7eb] px-4 py-3 shadow-sm">
       <audio ref={audioRef} src={audioUrl} preload="metadata" />
 
       <div className="flex items-center gap-3">
         {/* Play/Pause */}
         <button
           onClick={togglePlay}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#2563eb] text-white transition-colors hover:bg-[#2563eb]/80"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#2563eb] text-white transition-colors hover:bg-[#1d4ed8]"
         >
           {playing ? (
             <svg width="12" height="12" viewBox="0 0 14 14" fill="currentColor">
@@ -100,13 +100,13 @@ export function AudioPlayer({ audioUrl, onTimeUpdate }: AudioPlayerProps) {
         </button>
 
         {/* Time */}
-        <span className="text-[12px] text-gray-500 tabular-nums w-[42px] shrink-0">
+        <span className="text-[12px] text-[#6b7280] tabular-nums w-[42px] shrink-0">
           {formatTime(currentTime)}
         </span>
 
         {/* Progress bar */}
         <div
-          className="relative flex-1 h-1 rounded-full bg-white/[0.08] cursor-pointer group"
+          className="relative flex-1 h-1 rounded-full bg-[#e5e7eb] cursor-pointer group"
           onClick={seek}
         >
           <div
@@ -120,14 +120,14 @@ export function AudioPlayer({ audioUrl, onTimeUpdate }: AudioPlayerProps) {
         </div>
 
         {/* Duration */}
-        <span className="text-[12px] text-gray-500 tabular-nums w-[42px] shrink-0 text-right">
+        <span className="text-[12px] text-[#6b7280] tabular-nums w-[42px] shrink-0 text-right">
           {formatTime(duration)}
         </span>
 
         {/* Speed */}
         <button
           onClick={cycleSpeed}
-          className="shrink-0 rounded-md bg-white/[0.06] px-2 py-1 text-[11px] font-medium text-gray-400 hover:bg-white/[0.1] transition-colors"
+          className="shrink-0 rounded-md border border-[#e5e7eb] bg-white px-2 py-1 text-[11px] font-medium text-[#6b7280] hover:bg-[#f3f4f6] transition-colors"
         >
           {SPEEDS[speedIndex]}x
         </button>

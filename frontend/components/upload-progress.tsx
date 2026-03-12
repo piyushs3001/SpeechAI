@@ -112,12 +112,12 @@ export function UploadProgress({ jobId }: UploadProgressProps) {
       {/* Progress bar */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-300">{stepLabel}</span>
-          <span className="text-sm text-gray-500">{Math.round(status.progress)}%</span>
+          <span className="text-sm font-medium text-[#374151]">{stepLabel}</span>
+          <span className="text-sm text-[#6b7280]">{Math.round(status.progress)}%</span>
         </div>
-        <div className="h-2 w-full rounded-full bg-[rgba(255,255,255,0.08)] overflow-hidden">
+        <div className="h-2 w-full rounded-full bg-[#e5e7eb] overflow-hidden">
           <div
-            className="h-full rounded-full bg-[#64b5f6] transition-all duration-500"
+            className="h-full rounded-full bg-[#2563eb] transition-all duration-500"
             style={{ width: `${status.progress}%` }}
           />
         </div>
@@ -125,7 +125,7 @@ export function UploadProgress({ jobId }: UploadProgressProps) {
 
       {/* Queue position */}
       {status.status === "queued" && status.queue_position != null && (
-        <p className="text-sm text-gray-400 text-center">
+        <p className="text-sm text-[#6b7280] text-center">
           Queue position: {status.queue_position}
         </p>
       )}
@@ -133,12 +133,12 @@ export function UploadProgress({ jobId }: UploadProgressProps) {
       {/* Complete state */}
       {isComplete && (
         <div className="text-center space-y-4">
-          <p className="text-sm text-green-400">
+          <p className="text-sm text-green-600">
             Transcription complete!
           </p>
           <Link
             href={`/transcript/${meetingId}`}
-            className="inline-flex items-center rounded-lg bg-[#64b5f6] px-4 py-2 text-sm font-medium text-[#0f0f1a] transition-colors hover:bg-[#64b5f6]/80"
+            className="inline-flex items-center rounded-lg bg-[#2563eb] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#1d4ed8]"
           >
             View Transcript
           </Link>
@@ -148,12 +148,12 @@ export function UploadProgress({ jobId }: UploadProgressProps) {
       {/* Failed state */}
       {isFailed && (
         <div className="text-center space-y-4">
-          <p className="text-sm text-red-400">
+          <p className="text-sm text-red-600">
             {status.error || "Processing failed. Please try again."}
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="inline-flex items-center rounded-lg bg-red-500/10 px-4 py-2 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/20"
+            className="inline-flex items-center rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-100"
           >
             Try Again
           </button>

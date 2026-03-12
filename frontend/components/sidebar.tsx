@@ -73,7 +73,7 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="flex h-screen w-64 shrink-0 flex-col bg-[#131320] border-r border-white/5">
+    <aside className="flex h-screen w-64 shrink-0 flex-col bg-[#1a1a2e] border-r border-[#1a1a2e]">
       {/* Logo & App Name */}
       <div className="flex items-center gap-3 px-6 py-7">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#2563eb] text-sm font-bold text-white">
@@ -182,8 +182,8 @@ export function Sidebar() {
                     href={href}
                     className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] transition-colors ${
                       isActive
-                        ? "bg-[#2563eb]/10 text-[#2563eb]"
-                        : "text-gray-400 hover:bg-white/[0.04] hover:text-gray-200"
+                        ? "bg-white/10 text-white"
+                        : "text-gray-400 hover:bg-white/[0.06] hover:text-gray-200"
                     }`}
                   >
                     <span
@@ -203,7 +203,7 @@ export function Sidebar() {
 
         {/* User info */}
         {session?.user && (
-          <div className="mb-2 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2.5 mx-1">
+          <div className="mb-2 rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2.5 mx-1">
             <div className="flex items-center gap-2.5 min-w-0">
               {session.user.image ? (
                 // eslint-disable-next-line @next/next/no-img-element

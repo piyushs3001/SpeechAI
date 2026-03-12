@@ -41,14 +41,14 @@ export function TranscriptSegment({
     <button
       type="button"
       onClick={onClick}
-      className={`w-full text-left px-4 py-3 transition-colors ${
+      className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
         isActive
-          ? "bg-[#2563eb]/[0.08]"
-          : "hover:bg-white/[0.02]"
-      } ${isAction ? "border-l-2 border-l-orange-500/70 pl-[14px]" : ""}`}
+          ? "bg-blue-50"
+          : "hover:bg-[#f3f4f6]"
+      } ${isAction ? "border-l-2 border-l-orange-400 pl-[14px]" : ""}`}
     >
       {isAction && (
-        <span className="mb-1.5 inline-block rounded bg-orange-500/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-orange-400">
+        <span className="mb-1.5 inline-block rounded bg-orange-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-orange-600">
           Action Item
         </span>
       )}
@@ -67,12 +67,12 @@ export function TranscriptSegment({
             <span className="text-[13px] font-medium" style={{ color: speakerColor }}>
               {speakerName}
             </span>
-            <span className="text-[11px] text-gray-600 tabular-nums">
+            <span className="text-[11px] text-[#9ca3af] tabular-nums">
               {formatTimestamp(segment.start)}
             </span>
           </div>
           {/* Text */}
-          <p className="mt-0.5 text-[14px] leading-relaxed text-gray-300">
+          <p className="mt-0.5 text-[14px] leading-relaxed text-[#374151]">
             {segment.text}
           </p>
         </div>

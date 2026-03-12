@@ -72,8 +72,8 @@ export function SummaryPanel({ meetingId }: SummaryPanelProps) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
-          <div className="mb-3 h-5 w-5 mx-auto animate-spin rounded-full border-2 border-gray-700 border-t-[#2563eb]" />
-          <p className="text-[13px] text-gray-500">Loading summary...</p>
+          <div className="mb-3 h-5 w-5 mx-auto animate-spin rounded-full border-2 border-[#e5e7eb] border-t-[#2563eb]" />
+          <p className="text-[13px] text-[#6b7280]">Loading summary...</p>
         </div>
       </div>
     );
@@ -82,7 +82,7 @@ export function SummaryPanel({ meetingId }: SummaryPanelProps) {
   if (error || !data) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-[13px] text-gray-500">No summary available</p>
+        <p className="text-[13px] text-[#6b7280]">No summary available</p>
       </div>
     );
   }
@@ -102,18 +102,18 @@ export function SummaryPanel({ meetingId }: SummaryPanelProps) {
     <div className="flex flex-col">
       {/* Meeting Summary */}
       {data.summary && (
-        <section className="pb-5 mb-5 border-b border-white/5">
-          <h3 className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+        <section className="pb-5 mb-5 border-b border-[#e5e7eb]">
+          <h3 className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#6b7280]">
             Meeting Summary
           </h3>
-          <p className="text-[13px] leading-relaxed text-gray-300">{data.summary}</p>
+          <p className="text-[13px] leading-relaxed text-[#374151]">{data.summary}</p>
         </section>
       )}
 
       {/* Action Items */}
       {data.action_items && data.action_items.length > 0 && (
-        <section className="pb-5 mb-5 border-b border-white/5">
-          <h3 className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+        <section className="pb-5 mb-5 border-b border-[#e5e7eb]">
+          <h3 className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#6b7280]">
             Action Items
           </h3>
           <ul className="flex flex-col gap-2.5">
@@ -122,11 +122,11 @@ export function SummaryPanel({ meetingId }: SummaryPanelProps) {
                 <input
                   type="checkbox"
                   defaultChecked={item.done}
-                  className="mt-0.5 h-3.5 w-3.5 shrink-0 rounded border-gray-600 bg-transparent accent-[#2563eb]"
+                  className="mt-0.5 h-3.5 w-3.5 shrink-0 rounded border-[#d1d5db] accent-[#2563eb]"
                   readOnly
                 />
                 <div className="min-w-0">
-                  <p className="text-[13px] text-gray-300">{item.text}</p>
+                  <p className="text-[13px] text-[#374151]">{item.text}</p>
                   {item.assignee && (
                     <span
                       className="text-[11px] font-medium"
@@ -146,15 +146,15 @@ export function SummaryPanel({ meetingId }: SummaryPanelProps) {
 
       {/* Keywords */}
       {data.keywords && data.keywords.length > 0 && (
-        <section className="pb-5 mb-5 border-b border-white/5">
-          <h3 className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+        <section className="pb-5 mb-5 border-b border-[#e5e7eb]">
+          <h3 className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#6b7280]">
             Keywords
           </h3>
           <div className="flex flex-wrap gap-1.5">
             {data.keywords.map((kw) => (
               <span
                 key={kw}
-                className="rounded-full bg-[#2563eb]/10 px-2.5 py-0.5 text-[11px] font-medium text-[#2563eb]"
+                className="rounded-full bg-blue-50 px-2.5 py-0.5 text-[11px] font-medium text-[#2563eb]"
               >
                 {kw}
               </span>
@@ -166,7 +166,7 @@ export function SummaryPanel({ meetingId }: SummaryPanelProps) {
       {/* Speaker Stats */}
       {speakerStatsArray.length > 0 && (
         <section>
-          <h3 className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+          <h3 className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#6b7280]">
             Speaker Stats
           </h3>
           <div className="flex flex-col gap-3">
@@ -178,11 +178,11 @@ export function SummaryPanel({ meetingId }: SummaryPanelProps) {
                     <span className="text-[12px] font-medium" style={{ color }}>
                       {stat.speaker}
                     </span>
-                    <span className="text-[11px] text-gray-500 tabular-nums">
+                    <span className="text-[11px] text-[#6b7280] tabular-nums">
                       {Math.round(stat.talk_time_pct)}%
                     </span>
                   </div>
-                  <div className="h-1 rounded-full bg-white/[0.06]">
+                  <div className="h-1 rounded-full bg-[#f3f4f6]">
                     <div
                       className="h-full rounded-full transition-all"
                       style={{

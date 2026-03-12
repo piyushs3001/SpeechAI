@@ -54,17 +54,17 @@ export default function TeamPage() {
       <div className="mb-8">
         <Link
           href="/settings"
-          className="inline-flex items-center gap-1.5 text-sm text-gray-400 transition-colors hover:text-white mb-4"
+          className="inline-flex items-center gap-1.5 text-sm text-[#6b7280] transition-colors hover:text-[#111827] mb-4"
         >
           <ArrowLeft size={14} />
           Back to Settings
         </Link>
-        <h1 className="text-2xl font-semibold text-white">Team</h1>
+        <h1 className="text-2xl font-semibold text-[#111827]">Team</h1>
       </div>
 
       {/* Info */}
-      <div className="mb-6 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#64b5f6]/5 p-4">
-        <p className="text-sm text-gray-300">
+      <div className="mb-6 rounded-xl border border-blue-100 bg-blue-50 p-4">
+        <p className="text-sm text-[#374151]">
           Share your Google Drive folder with team members to give them access
           to meeting transcripts and recordings.
         </p>
@@ -73,7 +73,7 @@ export default function TeamPage() {
       {/* Members list */}
       {members.length === 0 ? (
         <EmptyState
-          icon={<Users size={40} className="text-gray-600" />}
+          icon={<Users size={40} className="text-[#9ca3af]" />}
           message="No team members found"
           description="Share your Google Drive folder with others to grant access."
         />
@@ -82,14 +82,14 @@ export default function TeamPage() {
           {members.map((member) => (
             <div
               key={member.email}
-              className="flex items-center justify-between rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-4"
+              className="flex items-center justify-between rounded-xl border border-[#e5e7eb] bg-white p-4 shadow-sm"
             >
-              <span className="text-sm text-white">{member.email}</span>
+              <span className="text-sm text-[#111827]">{member.email}</span>
               <span
                 className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                   member.role === "admin"
-                    ? "bg-[#64b5f6]/10 text-[#64b5f6]"
-                    : "bg-[rgba(255,255,255,0.08)] text-gray-400"
+                    ? "bg-blue-50 text-[#2563eb]"
+                    : "bg-[#f3f4f6] text-[#6b7280]"
                 }`}
               >
                 {member.role === "admin" ? "Admin" : "Member"}

@@ -37,7 +37,7 @@ export default function FolderViewPage() {
       <div className="mb-8">
         <Link
           href="/folders"
-          className="inline-flex items-center gap-1.5 text-sm text-gray-400 transition-colors hover:text-white mb-4"
+          className="inline-flex items-center gap-1.5 text-sm text-[#6b7280] transition-colors hover:text-[#111827] mb-4"
         >
           <ArrowLeft size={14} />
           Back to Folders
@@ -49,7 +49,7 @@ export default function FolderViewPage() {
               style={{ backgroundColor: folder.color }}
             />
           )}
-          <h1 className="text-2xl font-semibold text-white">
+          <h1 className="text-2xl font-semibold text-[#111827]">
             {folder?.name || "Folder"}
           </h1>
         </div>
@@ -60,12 +60,12 @@ export default function FolderViewPage() {
         <LoadingSpinner message="Loading meetings..." />
       ) : filteredMeetings.length === 0 ? (
         <EmptyState
-          icon={<Mic size={40} className="text-gray-600" />}
+          icon={<Mic size={40} className="text-[#9ca3af]" />}
           message="No meetings in this folder yet"
           description="Upload a recording or move an existing meeting here."
         />
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="rounded-xl border border-[#e5e7eb] bg-white overflow-hidden shadow-sm">
           {filteredMeetings.map((meeting) => (
             <MeetingCard key={meeting.id} meeting={meeting} />
           ))}
