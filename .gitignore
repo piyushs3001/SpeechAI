@@ -8,3 +8,6 @@ __pycache__/
 .env
 service-account.json
 backend/models/
+backend/venv/
+venv/
+.env.local
